@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>HomeScreen</class>
+ <widget class="QWidget" name="HomeScreen">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -22,6 +22,12 @@
      <height>23</height>
     </rect>
    </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <property name="value">
     <number>100</number>
    </property>
@@ -29,7 +35,7 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QLabel" name="time">
+  <widget class="QLabel" name="labelTime">
    <property name="geometry">
     <rect>
      <x>260</x>
@@ -50,7 +56,7 @@
     <string>12:00 AM</string>
    </property>
   </widget>
-  <widget class="QLabel" name="date">
+  <widget class="QLabel" name="labelDate">
    <property name="geometry">
     <rect>
      <x>280</x>
@@ -63,7 +69,7 @@
     <string>26 Apr</string>
    </property>
   </widget>
-  <widget class="QProgressBar" name="insulinFillBar">
+  <widget class="QProgressBar" name="insulinRemainingBar">
    <property name="geometry">
     <rect>
      <x>520</x>
@@ -71,6 +77,12 @@
      <width>118</width>
      <height>23</height>
     </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
    </property>
    <property name="value">
     <number>100</number>
@@ -92,7 +104,7 @@
     <string>100%</string>
    </property>
   </widget>
-  <widget class="QLabel" name="insulinFillAmount">
+  <widget class="QLabel" name="insulinRemaining">
    <property name="geometry">
     <rect>
      <x>550</x>
@@ -130,8 +142,14 @@
      <height>211</height>
     </rect>
    </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <property name="text">
-    <string>TextLabel</string>
+    <string>Graph Placeholder</string>
    </property>
   </widget>
   <widget class="QLabel" name="currentBldGlu">
@@ -235,6 +253,12 @@
      <height>51</height>
     </rect>
    </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <property name="font">
     <font>
      <family>DejaVu Sans</family>
@@ -242,6 +266,19 @@
      <weight>75</weight>
      <bold>true</bold>
     </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+    background-color: #f0ad4e;
+    color: black;
+    font-weight: bold;
+    border-radius: 10px;
+    padding: 10px;
+}
+QPushButton:hover {
+    background-color: #ffaa33;
+}
+</string>
    </property>
    <property name="text">
     <string>OPTIONS</string>
@@ -296,6 +333,12 @@
      <height>51</height>
     </rect>
    </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <property name="font">
     <font>
      <family>DejaVu Sans</family>
@@ -304,8 +347,35 @@
      <bold>true</bold>
     </font>
    </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+QPushButton:hover {
+    background-color: #ffaa33;
+}
+</string>
+   </property>
    <property name="text">
     <string>BOLUS</string>
+   </property>
+  </widget>
+  <widget class="Line" name="line_2">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>240</y>
+     <width>641</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
    </property>
   </widget>
  </widget>
