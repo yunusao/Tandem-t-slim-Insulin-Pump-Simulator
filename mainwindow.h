@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QDateTime>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -15,7 +16,11 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void powerPressed();
+    void powerReleased();
 private:
     Ui::MainWindow *ui;
+    QDateTime pressStartTime;
 };
 #endif // MAINWINDOW_H

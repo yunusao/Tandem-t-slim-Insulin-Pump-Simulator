@@ -1,0 +1,34 @@
+#ifndef BOLUSSCREEN_H
+#define BOLUSSCREEN_H
+
+#include "carbentryscreen.h"
+#include "bgscreen.h"
+
+#include <QWidget>
+
+namespace Ui {
+class BolusScreen;
+}
+
+class BolusScreen : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit BolusScreen(QWidget *parent = nullptr);
+    ~BolusScreen();
+
+private slots:
+    void showCarbEntryScreen();
+    void showBgScreen();
+    void updateCarbs(QString value);
+    void updateBG(QString value);
+
+private:
+    Ui::BolusScreen *ui;
+    CarbEntryScreen *carbScreen;
+    bgscreen *bgScreen;
+
+};
+
+#endif // BOLUSSCREEN_H

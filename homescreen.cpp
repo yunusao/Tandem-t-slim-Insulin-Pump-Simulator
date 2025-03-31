@@ -1,5 +1,6 @@
 #include <QTimer>
 #include <QDateTime>
+#include <QMessageBox>
 #include "homescreen.h"
 #include "ui_homescreen.h"
 
@@ -9,6 +10,25 @@ HomeScreen::HomeScreen(QWidget *parent)
     , timer(new QTimer(this))  // Initialize timer
 {
     ui->setupUi(this);
+    ui->powerOffOverlay->show();
+
+    bolusScreen = new BolusScreen(this);
+    optionsScreen = new OptionsScreen(this);
+
+    // Hide them initially
+    bolusScreen->hide();
+    optionsScreen->hide();
+
+    // Connect buttons to switch
+    connect(ui->bolusButton, &QPushButton::clicked, this, &HomeScreen::showBolusScreen);
+    connect(ui->optionsButton, &QPushButton::clicked, this, &HomeScreen::showOptionsScreen);
+
+    // Tandem logo returns to home (from inside Bolus/Options)
+    connect(bolusScreen->findChild<QPushButton*>("homeButton"), &QPushButton::clicked, this, &HomeScreen::returnHome);
+    connect(optionsScreen->findChild<QPushButton*>("homeButton"), &QPushButton::clicked, this, &HomeScreen::returnHome);
+
+    connect(ui->powerButton_2, &QPushButton::pressed, this, &HomeScreen::powerPressed);
+    connect(ui->powerButton_2, &QPushButton::released, this, &HomeScreen::powerReleased);
 
     // Connect the timer's timeout signal to updateTime slot
     connect(timer, &QTimer::timeout, this, &HomeScreen::updateTime);
@@ -36,3 +56,41 @@ void HomeScreen::updateTime()
     // Set the date in format like "26 Apr"
     ui->labelDate->setText(date.toString("dd MMM"));
 }
+
+void HomeScreen::powerPressed()
+{
+    pressStartTime = QDateTime::currentDateTime();
+}
+
+void HomeScreen::powerReleased()
+{
+    int duration = pressStartTime.msecsTo(QDateTime::currentDateTime());
+    if (duration >= 3000) {
+        ui->powerOffOverlay->hide();  // Reveal the Home UI
+    } else {
+        QMessageBox::information(this, "Power", "Hold the button to power on.");
+    }
+}
+
+void HomeScreen::showBolusScreen() {
+    this->hide();            // hide Home
+    //bolusScreen->show();     // show Bolus
+    bolusScreen->setWindowFlags(Qt::Window);  // Makes it a standalone window
+    bolusScreen->show();
+
+}
+
+void HomeScreen::showOptionsScreen() {
+    this->hide();
+    //optionsScreen->show();
+    optionsScreen->setWindowFlags(Qt::Window);  // Makes it a standalone window
+    optionsScreen->show();
+}
+
+void HomeScreen::returnHome() {
+    bolusScreen->hide();
+    optionsScreen->hide();
+    this->show();            // Show Home again
+}
+
+
