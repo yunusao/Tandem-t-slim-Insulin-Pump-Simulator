@@ -12,7 +12,15 @@ bgscreen::bgscreen(QWidget *parent) :
     // Connect digit buttons
     connect(ui->btn0, &QPushButton::clicked, this, [=]() { handleDigit("0"); });
     connect(ui->btn1, &QPushButton::clicked, this, [=]() { handleDigit("1"); });
-    // repeat for btn2–btn9
+    connect(ui->btn2, &QPushButton::clicked, this, [=]() { handleDigit("2"); });
+    connect(ui->btn3, &QPushButton::clicked, this, [=]() { handleDigit("3"); });
+    connect(ui->btn4, &QPushButton::clicked, this, [=]() { handleDigit("4"); });
+    connect(ui->btn5, &QPushButton::clicked, this, [=]() { handleDigit("5"); });
+    connect(ui->btn6, &QPushButton::clicked, this, [=]() { handleDigit("6"); });
+    connect(ui->btn7, &QPushButton::clicked, this, [=]() { handleDigit("7"); });
+    connect(ui->btn8, &QPushButton::clicked, this, [=]() { handleDigit("8"); });
+    connect(ui->btn9, &QPushButton::clicked, this, [=]() { handleDigit("9"); });
+
 
     connect(ui->btnClear, &QPushButton::clicked, this, &bgscreen::clearInput);
     connect(ui->btnPlusMinus, &QPushButton::clicked, this, &bgscreen::toggleSign);
