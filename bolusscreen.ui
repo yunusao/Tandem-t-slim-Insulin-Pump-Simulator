@@ -13,6 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <!-- Tandem logo button -->
   <widget class="QPushButton" name="homeButton">
    <property name="geometry">
     <rect>
@@ -26,6 +27,7 @@
     <string>Tandem LOGO</string>
    </property>
   </widget>
+  <!-- Back button -->
   <widget class="QPushButton" name="backButton">
    <property name="geometry">
     <rect>
@@ -39,54 +41,7 @@
     <string>&lt;-</string>
    </property>
   </widget>
-  <widget class="QLabel" name="labelUnits">
-   <property name="geometry">
-    <rect>
-     <x>120</x>
-     <y>20</y>
-     <width>301</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>DejaVu Sans</family>
-     <pointsize>12</pointsize>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>0</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label">
-   <property name="geometry">
-    <rect>
-     <x>120</x>
-     <y>40</y>
-     <width>301</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>DejaVu Sans</family>
-     <pointsize>10</pointsize>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>units</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-  </widget>
+  <!-- Confirm button -->
   <widget class="QPushButton" name="confirmButton">
    <property name="geometry">
     <rect>
@@ -100,6 +55,21 @@
     <string>✓</string>
    </property>
   </widget>
+  <!-- New INSULIN button -->
+  <widget class="QPushButton" name="insulinButton">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>10</y>
+     <width>83</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>INSULIN</string>
+   </property>
+  </widget>
+  <!-- Carbs Button -->
   <widget class="QPushButton" name="carbsButton">
    <property name="geometry">
     <rect>
@@ -122,6 +92,7 @@
 grams</string>
    </property>
   </widget>
+  <!-- BG Button -->
   <widget class="QPushButton" name="bgButton">
    <property name="geometry">
     <rect>
@@ -143,6 +114,7 @@ grams</string>
     <string>Add BG</string>
    </property>
   </widget>
+  <!-- View Calculation button -->
   <widget class="QPushButton" name="viewCalcButton">
    <property name="geometry">
     <rect>
@@ -152,17 +124,11 @@ grams</string>
      <height>25</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>DejaVu Sans</family>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
    <property name="text">
     <string>View Calculation</string>
    </property>
   </widget>
+  <!-- Label for CARBS -->
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
@@ -184,6 +150,7 @@ grams</string>
     <string>CARBS</string>
    </property>
   </widget>
+  <!-- Label for GLUCOSE -->
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>

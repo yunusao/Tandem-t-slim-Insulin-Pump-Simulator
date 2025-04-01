@@ -1,0 +1,10 @@
+2025-03-31 22:32:47 - CGM Disconnection: Insulin delivery suspended. Check CGM connection.
+2025-03-31 22:33:36 - Low Insulin: Insulin remaining at 10U. Please refill the cartridge.
+2025-03-31 22:33:59 - Low Insulin: Insulin remaining at 50U. Please refill the cartridge.
+2025-03-31 22:36:35 - CGM Disconnection: Insulin delivery suspended. Check CGM connection.
+2025-03-31 22:37:32 - Low Battery: Battery level at 20%. Please charge the device.
+2025-03-31 22:38:14 - Battery Depleted: Battery level reached 0%. Device powering off.
+2025-03-31 22:38:24 - Low Battery: Battery level at 2%. Please charge the device.
+2025-03-31 22:40:26 - Low Insulin: Insulin remaining at 50U. Please refill the cartridge.
+2025-03-31 22:43:06 - Low Insulin: Insulin remaining at 50U. Please refill the cartridge.
+2025-03-31 22:45:05 - Low Insulin: Insulin remaining at 50U. Please refill the cartridge.

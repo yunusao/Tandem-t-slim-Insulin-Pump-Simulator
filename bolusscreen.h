@@ -23,12 +23,12 @@ private slots:
     void showBgScreen();
     void updateCarbs(QString value);
     void updateBG(QString value);
+    void showInsulinDialog();  // New slot for manual insulin injection
 
 private:
     Ui::BolusScreen *ui;
     CarbEntryScreen *carbScreen;
     bgscreen *bgScreen;
-
 };
 
 #endif // BOLUSSCREEN_H
