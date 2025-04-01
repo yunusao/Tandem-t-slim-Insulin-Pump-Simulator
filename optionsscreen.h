@@ -2,6 +2,7 @@
 #define OPTIONSSCREEN_H
 
 #include <QWidget>
+#include "profilepage.h"
 
 namespace Ui {
 class OptionsScreen;
@@ -20,6 +21,7 @@ private slots:
 
 private:
     Ui::OptionsScreen *ui;
+    ProfilePage *profilePage;
 };
 
 #endif // OPTIONSSCREEN_H

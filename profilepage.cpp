@@ -9,11 +9,6 @@ ProfilePage::ProfilePage(QWidget *parent) :
     qDebug() <<"Profile"<< QSqlDatabase::database().databaseName();
     ui->setupUi(this);
     loadProfiles();
-    connect(ui->backButton, &QPushButton::clicked, this, [=]() {
-        this->hide();
-        parentWidget()->show();  // Show BolusScreen again
-    });
-
 }
 
 ProfilePage::~ProfilePage()
@@ -68,9 +63,10 @@ void ProfilePage::on_createProfileButton_clicked()
 
 void ProfilePage::on_backButton_clicked()
 {
+    this->hide();
     if ( parentWidget()){
         parentWidget()->show();
     }
-    this->close();
+
 }
 

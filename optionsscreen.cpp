@@ -7,6 +7,9 @@ OptionsScreen::OptionsScreen(QWidget *parent) :
     ui(new Ui::OptionsScreen)
 {
     ui->setupUi(this);
+    profilePage = new ProfilePage(this);
+    profilePage->setWindowFlags(Qt::Window);
+    profilePage->hide();
 }
 
 OptionsScreen::~OptionsScreen()
@@ -17,7 +20,5 @@ OptionsScreen::~OptionsScreen()
 void OptionsScreen::on_personalProfilesButton_clicked()
 {
     this->hide();
-    ProfilePage *page = new ProfilePage(nullptr);
-    page->show();
-
+    profilePage->show();
 }
