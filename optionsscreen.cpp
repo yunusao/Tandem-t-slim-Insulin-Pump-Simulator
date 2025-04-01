@@ -1,5 +1,6 @@
 #include "optionsscreen.h"
 #include "ui_optionsscreen.h"
+#include "profilepage.h"
 
 OptionsScreen::OptionsScreen(QWidget *parent) :
     QWidget(parent),
@@ -12,3 +13,11 @@ OptionsScreen::~OptionsScreen()
 {
     delete ui;
 }
+
+void OptionsScreen::on_personalProfilesButton_clicked()
+{
+    ProfilePage *page = new ProfilePage();
+    page->show();
+    this->close();
+}
+

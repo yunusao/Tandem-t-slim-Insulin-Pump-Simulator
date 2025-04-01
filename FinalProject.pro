@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,26 +12,32 @@ SOURCES += \
     bgscreen.cpp \
     bolusscreen.cpp \
     carbentryscreen.cpp \
+    createeditprofile.cpp \
     homescreen.cpp \
     main.cpp \
     mainwindow.cpp \
-    optionsscreen.cpp
+    optionsscreen.cpp \
+    profilepage.cpp
 
 HEADERS += \
     bgscreen.h \
     bolusscreen.h \
     carbentryscreen.h \
+    createeditprofile.h \
     homescreen.h \
     mainwindow.h \
-    optionsscreen.h
+    optionsscreen.h \
+    profilepage.h
 
 FORMS += \
     bgscreen.ui \
     bolusscreen.ui \
     carbentryscreen.ui \
+    createeditprofile.ui \
     homescreen.ui \
     mainwindow.ui \
-    optionsscreen.ui
+    optionsscreen.ui \
+    profilepage.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

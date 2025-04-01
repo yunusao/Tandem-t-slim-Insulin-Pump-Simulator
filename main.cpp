@@ -1,9 +1,30 @@
 #include "mainwindow.h"
 #include "homescreen.h"
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QDebug>
+#include <QDir>
+#include <QSqlError>
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("insulinTandem.db");
+    if (!db.open()){
+      qDebug() << "failed 1";
+    }
+    QSqlQuery query;
+    QString createTable = "CREATE TABLE IF NOT EXISTS profiles ("
+            "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+            "name TEXT,"
+            "basalRate REAL,"
+            "carbRatio REAL,"
+            "correctionFactor REAL,"
+            "glucoseTarget REAL)";
+    if (!query.exec(createTable)){
+        qDebug() << "failed 2";
+    }
     QApplication a(argc, argv);
 
     // Dark Theme Style Sheet

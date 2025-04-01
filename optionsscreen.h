@@ -15,6 +15,9 @@ public:
     explicit OptionsScreen(QWidget *parent = nullptr);
     ~OptionsScreen();
 
+private slots:
+    void on_personalProfilesButton_clicked();
+
 private:
     Ui::OptionsScreen *ui;
 };

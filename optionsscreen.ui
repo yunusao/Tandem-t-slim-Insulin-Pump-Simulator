@@ -16,8 +16,8 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>370</x>
-     <y>140</y>
+     <x>380</x>
+     <y>10</y>
      <width>211</width>
      <height>31</height>
     </rect>
@@ -29,14 +29,40 @@
   <widget class="QPushButton" name="homeButton">
    <property name="geometry">
     <rect>
-     <x>720</x>
-     <y>110</y>
+     <x>560</x>
+     <y>90</y>
      <width>141</width>
      <height>111</height>
     </rect>
    </property>
    <property name="text">
     <string>Tandem LOGO</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="personalProfilesButton">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>90</y>
+     <width>161</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Personal Profiles Logo</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton">
+   <property name="geometry">
+    <rect>
+     <x>350</x>
+     <y>90</y>
+     <width>151</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Alerts Logo</string>
    </property>
   </widget>
  </widget>
