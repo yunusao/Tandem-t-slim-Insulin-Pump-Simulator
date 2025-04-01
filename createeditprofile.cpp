@@ -27,7 +27,7 @@ CreateEditProfile::~CreateEditProfile()
 {
     delete ui;
 }
-
+/*
 void CreateEditProfile::on_submiButton_clicked()
 {
     qDebug() <<"Name: " << ui->nameEdit->text();
@@ -59,8 +59,56 @@ void CreateEditProfile::on_submiButton_clicked()
         this->close();
     }
 }
+*/
+void CreateEditProfile::on_submiButton_clicked()
+{
+    // Validate
+    if (ui->nameEdit->text().isEmpty() || ui->basalEdit->text().isEmpty() ||
+        ui->carbEdit->text().isEmpty() || ui->corrEdit->text().isEmpty() ||
+        ui->targetEdit->text().isEmpty()) {
+        QMessageBox::warning(this, "Error", "All fields are required.");
+        return;
+    }
 
+    // Prepare query
+    QSqlQuery q;
+    if (id == -1) {
+        q.prepare("INSERT INTO profiles (name, basalRate, carbRatio, correctionFactor, glucoseTarget) "
+                  "VALUES (:n, :b, :c, :cf, :gt)");
+    } else {
+        q.prepare("UPDATE profiles SET name=:n, basalRate=:b, carbRatio=:c, correctionFactor=:cf, glucoseTarget=:gt "
+                  "WHERE id=:id");
+        q.bindValue(":id", id);
+    }
 
+    // Bind values
+    q.bindValue(":n", ui->nameEdit->text());
+    q.bindValue(":b", ui->basalEdit->text().toDouble());
+    q.bindValue(":c", ui->carbEdit->text().toDouble());
+    q.bindValue(":cf", ui->corrEdit->text().toDouble());
+    q.bindValue(":gt", ui->targetEdit->text().toDouble());
+
+    // Execute
+    if (q.exec()) {
+        emit profileSaved();  // ✅ let the parent know to reload
+        if (parentWidget()) {
+              parentWidget()->show();  // ✅ Bring back ProfilePage
+        }
+        this->close();  // ✅ Done, close safely
+    } else {
+        QMessageBox::critical(this, "Database Error", "Failed to save profile.");
+    }
+}
+
+void CreateEditProfile::on_cancelButton_clicked()
+{
+    if (parentWidget()) {
+        parentWidget()->show();  // return to ProfilePage
+    }
+    this->close();
+
+}
+/*
 void CreateEditProfile::on_cancelButton_clicked()
 {
     if (QWidget *page = parentWidget()){
@@ -68,3 +116,4 @@ void CreateEditProfile::on_cancelButton_clicked()
     }
     this->close();
 }
+*/

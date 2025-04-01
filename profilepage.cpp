@@ -34,7 +34,10 @@ void ProfilePage::loadProfiles() {
       ui->profilesTable->setCellWidget(row,6,deleteButton);
       connect(editButton, &QPushButton::clicked,[=](){
           qDebug() << id;
-          CreateEditProfile *editProfile = new CreateEditProfile(nullptr,id);
+          //CreateEditProfile *editProfile = new CreateEditProfile(nullptr,id);
+          CreateEditProfile *editProfile = new CreateEditProfile(this,id);
+          editProfile->setWindowFlags(Qt::Window);  // ✅ Make it a standalone screen
+          this->hide();
           editProfile->show();
       });
       connect(deleteButton, &QPushButton::clicked,[=](){
@@ -55,9 +58,13 @@ void ProfilePage::loadProfiles() {
 
 void ProfilePage::on_createProfileButton_clicked()
 {
-    CreateEditProfile *createProfile = new CreateEditProfile(nullptr, -1);
+    //CreateEditProfile *createProfile = new CreateEditProfile(nullptr, -1);
+    CreateEditProfile *createProfile = new CreateEditProfile(this, -1);
+    createProfile->setWindowFlags(Qt::Window);  // ✅ Make it a standalone screen
+    this->hide();
     createProfile->show();
-    connect(createProfile,&QWidget::destroyed,this,&ProfilePage::loadProfiles);
+    connect(createProfile, &CreateEditProfile::profileSaved, this, &ProfilePage::loadProfiles);  // ✅ refresh on save
+    //connect(createProfile,&QWidget::destroyed,this,&ProfilePage::loadProfiles);
 }
 
 

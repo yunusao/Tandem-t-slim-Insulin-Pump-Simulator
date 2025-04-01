@@ -29,6 +29,8 @@ private:
     Ui::CreateEditProfile *ui;
     int id;
 
+signals:
+    void profileSaved();  // ✅ will notify parent to reload
 };
 
 #endif // CREATEEDITPROFILE_H
