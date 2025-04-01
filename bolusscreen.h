@@ -4,6 +4,7 @@
 #include "carbentryscreen.h"
 #include "bgscreen.h"
 #include "correctionsuggestionscreen.h"
+#include "confirmbolusscreen.h"
 
 #include <QWidget>
 
@@ -24,6 +25,7 @@ private slots:
     void showBgScreen();
     void updateCarbs(QString value);
     void updateBG(QString value);
+    void showConfirmBolusScreen();
     void showInsulinDialog();  // New slot for manual insulin injection
 
 private:
@@ -31,6 +33,7 @@ private:
     CarbEntryScreen *carbScreen;
     bgscreen *bgScreen;
     CorrectionSuggestionScreen *correctionScreen;
+    ConfirmBolusScreen *confirmBolusScreen;
 };
 
 #endif // BOLUSSCREEN_H

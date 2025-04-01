@@ -19,10 +19,7 @@ CorrectionSuggestionScreen::CorrectionSuggestionScreen(QWidget *parent) :
     });
 
     connect(ui->confirmButton, &QPushButton::clicked, this, [=]() {
-        QString fullText = ui->labelBGValue->text();  // e.g. "4\nmmol/L"
-        QString bg = fullText.split("\n").first();    // Extract just the "4"
-
-        emit correctionConfirmed(bg);           // ✅ Send it exactly as-is
+        emit correctionConfirmed(bgValueRaw);           // ✅ Send it exactly as-is
 
         this->hide();
 
@@ -40,6 +37,7 @@ CorrectionSuggestionScreen::~CorrectionSuggestionScreen()
 
 void CorrectionSuggestionScreen::setBG(QString bg)
 {
+    bgValueRaw = bg;
     ui->labelBGValue->setText(bg + " mmol/L");
 }
 

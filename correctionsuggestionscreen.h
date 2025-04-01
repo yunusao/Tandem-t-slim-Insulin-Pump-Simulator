@@ -20,6 +20,7 @@ public:
 
 private:
     Ui::CorrectionSuggestionScreen *ui;
+    QString bgValueRaw;
 
 signals:
     void correctionConfirmed(QString bgValue);

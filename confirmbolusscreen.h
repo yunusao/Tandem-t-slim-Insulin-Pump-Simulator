@@ -14,6 +14,9 @@ class ConfirmBolusScreen : public QWidget
 public:
     explicit ConfirmBolusScreen(QWidget *parent = nullptr);
     ~ConfirmBolusScreen();
+    void setCarbs(QString value);
+    void setBG(QString value);
+    void setUnits(QString value);
 
 private:
     Ui::ConfirmBolusScreen *ui;
