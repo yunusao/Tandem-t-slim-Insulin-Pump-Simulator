@@ -98,12 +98,12 @@
    </column>
    <column>
     <property name="text">
-     <string>Edit</string>
+     <string/>
     </property>
    </column>
    <column>
     <property name="text">
-     <string>Delete</string>
+     <string/>
     </property>
    </column>
   </widget>
