@@ -2,6 +2,7 @@
 #include "ui_bolusscreen.h"
 #include <QInputDialog>
 #include "homescreen.h" // To call manualInsulinInjection
+#include "correctionsuggestionscreen.h"
 
 BolusScreen::BolusScreen(QWidget *parent) :
     QWidget(parent),
@@ -10,15 +11,19 @@ BolusScreen::BolusScreen(QWidget *parent) :
     ui->setupUi(this);
     carbScreen = new CarbEntryScreen(this);  // Parent = BolusScreen
     bgScreen = new bgscreen(this);             // Parent = BolusScreen
+    correctionScreen = new CorrectionSuggestionScreen(this);
 
     carbScreen->hide();
     bgScreen->hide();
+    bgScreen->setCorrectionScreen(correctionScreen);
+    correctionScreen->hide();
 
     connect(ui->carbsButton, &QPushButton::clicked, this, &BolusScreen::showCarbEntryScreen);
     connect(ui->bgButton, &QPushButton::clicked, this, &BolusScreen::showBgScreen);
 
     connect(carbScreen, &CarbEntryScreen::carbsEntered, this, &BolusScreen::updateCarbs);
     connect(bgScreen, &bgscreen::bgEntered, this, &BolusScreen::updateBG);
+    connect(correctionScreen, &CorrectionSuggestionScreen::correctionConfirmed, this, &BolusScreen::updateBG);
 
     // Connect new INSULIN button to manual injection slot
     connect(ui->insulinButton, &QPushButton::clicked, this, &BolusScreen::showInsulinDialog);

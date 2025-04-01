@@ -3,6 +3,7 @@
 
 #include "carbentryscreen.h"
 #include "bgscreen.h"
+#include "correctionsuggestionscreen.h"
 
 #include <QWidget>
 
@@ -29,6 +30,7 @@ private:
     Ui::BolusScreen *ui;
     CarbEntryScreen *carbScreen;
     bgscreen *bgScreen;
+    CorrectionSuggestionScreen *correctionScreen;
 };
 
 #endif // BOLUSSCREEN_H

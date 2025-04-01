@@ -12,6 +12,8 @@ SOURCES += \
     bgscreen.cpp \
     bolusscreen.cpp \
     carbentryscreen.cpp \
+    confirmbolusscreen.cpp \
+    correctionsuggestionscreen.cpp \
     homescreen.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -21,6 +23,8 @@ HEADERS += \
     bgscreen.h \
     bolusscreen.h \
     carbentryscreen.h \
+    confirmbolusscreen.h \
+    correctionsuggestionscreen.h \
     homescreen.h \
     mainwindow.h \
     optionsscreen.h
@@ -29,6 +33,8 @@ FORMS += \
     bgscreen.ui \
     bolusscreen.ui \
     carbentryscreen.ui \
+    confirmbolusscreen.ui \
+    correctionsuggestionscreen.ui \
     homescreen.ui \
     mainwindow.ui \
     optionsscreen.ui
