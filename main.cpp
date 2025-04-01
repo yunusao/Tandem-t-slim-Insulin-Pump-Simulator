@@ -9,8 +9,9 @@
 
 int main(int argc, char *argv[])
 {
+    QApplication a(argc, argv);
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("insulinTandem.db");
+    db.setDatabaseName(QCoreApplication::applicationDirPath() + "/insulinTandem.db");
     if (!db.open()){
       qDebug() << "failed 1";
     }
@@ -25,8 +26,6 @@ int main(int argc, char *argv[])
     if (!query.exec(createTable)){
         qDebug() << "failed 2";
     }
-    QApplication a(argc, argv);
-
     // Dark Theme Style Sheet
     QString darkStyle = R"(
         /* General widget styling */

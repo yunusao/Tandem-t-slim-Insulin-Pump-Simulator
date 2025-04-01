@@ -16,8 +16,8 @@ OptionsScreen::~OptionsScreen()
 
 void OptionsScreen::on_personalProfilesButton_clicked()
 {
-    ProfilePage *page = new ProfilePage();
+    this->hide();
+    ProfilePage *page = new ProfilePage(nullptr);
     page->show();
-    this->close();
-}
 
+}

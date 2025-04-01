@@ -6,7 +6,14 @@ ProfilePage::ProfilePage(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ProfilePage)
 {
+    qDebug() <<"Profile"<< QSqlDatabase::database().databaseName();
     ui->setupUi(this);
+    loadProfiles();
+    connect(ui->backButton, &QPushButton::clicked, this, [=]() {
+        this->hide();
+        parentWidget()->show();  // Show BolusScreen again
+    });
+
 }
 
 ProfilePage::~ProfilePage()
@@ -22,19 +29,30 @@ void ProfilePage::loadProfiles() {
       int id = q.value("id").toInt();
       ui->profilesTable->insertRow(row);
       ui->profilesTable->setItem(row,0, new QTableWidgetItem(q.value("name").toString()));
-      ui->profilesTable->setItem(row,0, new QTableWidgetItem(q.value("basalRate").toString()));
-      ui->profilesTable->setItem(row,0, new QTableWidgetItem(q.value("carbRatio").toString()));
-      ui->profilesTable->setItem(row,0, new QTableWidgetItem(q.value("correctionFactor").toString()));
-      ui->profilesTable->setItem(row,0, new QTableWidgetItem(q.value("glucoseTarget").toString()));
+      ui->profilesTable->setItem(row,1, new QTableWidgetItem(q.value("basalRate").toString()));
+      ui->profilesTable->setItem(row,2, new QTableWidgetItem(q.value("carbRatio").toString()));
+      ui->profilesTable->setItem(row,3, new QTableWidgetItem(q.value("correctionFactor").toString()));
+      ui->profilesTable->setItem(row,4, new QTableWidgetItem(q.value("glucoseTarget").toString()));
       QPushButton *editButton = new QPushButton("Edit");
       QPushButton *deleteButton = new QPushButton("Delete");
       ui->profilesTable->setCellWidget(row,5,editButton);
-      ui->profilesTable->setCellWidget(row,5,deleteButton);
+      ui->profilesTable->setCellWidget(row,6,deleteButton);
       connect(editButton, &QPushButton::clicked,[=](){
-          CreateEditProfile *editProfile = new CreateEditProfile((nullptr,id));
-      })
-
-
+          qDebug() << id;
+          CreateEditProfile *editProfile = new CreateEditProfile(nullptr,id);
+          editProfile->show();
+      });
+      connect(deleteButton, &QPushButton::clicked,[=](){
+          if(QMessageBox::question(this, "Confirm Delete","Are you sure",
+                                   QMessageBox::Yes | QMessageBox::No)==QMessageBox::Yes){
+              QSqlQuery del;
+              del.prepare("DELETE FROM profiles WHERE id=:id");
+              del.bindValue(":id",id);
+              del.exec();
+              loadProfiles();
+          }
+      });
+      row++;
     }
 
 
@@ -43,7 +61,16 @@ void ProfilePage::loadProfiles() {
 void ProfilePage::on_createProfileButton_clicked()
 {
     CreateEditProfile *createProfile = new CreateEditProfile(nullptr, -1);
+    createProfile->show();
+    connect(createProfile,&QWidget::destroyed,this,&ProfilePage::loadProfiles);
+}
 
 
+void ProfilePage::on_backButton_clicked()
+{
+    if ( parentWidget()){
+        parentWidget()->show();
+    }
+    this->close();
 }
 

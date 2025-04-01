@@ -3,7 +3,9 @@
 
 #include <QWidget>
 #include <QTableWidget>
+#include <QMessageBox>
 #include <QSqlQuery>
+#include <QDebug>
 
 
 
@@ -21,6 +23,8 @@ public:
 
 private slots:
     void on_createProfileButton_clicked();
+
+    void on_backButton_clicked();
 
 private:
     Ui::ProfilePage *ui;
