@@ -32,14 +32,19 @@ void ProfilePage::loadProfiles() {
       QPushButton *deleteButton = new QPushButton("Delete");
       ui->profilesTable->setCellWidget(row,5,editButton);
       ui->profilesTable->setCellWidget(row,6,deleteButton);
-      connect(editButton, &QPushButton::clicked,[=](){
+      //edit button
+      connect(editButton, &QPushButton::clicked, [=]() {
           qDebug() << id;
-          //CreateEditProfile *editProfile = new CreateEditProfile(nullptr,id);
-          CreateEditProfile *editProfile = new CreateEditProfile(this,id);
-          editProfile->setWindowFlags(Qt::Window);  // ✅ Make it a standalone screen
+
+          CreateEditProfile *editProfile = new CreateEditProfile(this, id);
+          editProfile->setWindowFlags(Qt::Window);
+
+          connect(editProfile, &CreateEditProfile::profileSaved, this, &ProfilePage::loadProfiles);  // ✅ Add this line
+
           this->hide();
           editProfile->show();
       });
+
       connect(deleteButton, &QPushButton::clicked,[=](){
           if(QMessageBox::question(this, "Confirm Delete","Are you sure",
                                    QMessageBox::Yes | QMessageBox::No)==QMessageBox::Yes){
