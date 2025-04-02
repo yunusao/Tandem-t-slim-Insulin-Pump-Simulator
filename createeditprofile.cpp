@@ -9,7 +9,7 @@ CreateEditProfile::CreateEditProfile(QWidget *parent, int editProfileId) :
     qDebug() <<"Create"<< QSqlDatabase::database().databaseName();
     if (id != -1) {
         qDebug() << id;
-        QSqlQuery q;;
+        QSqlQuery q;
         q.prepare("SELECT * FROM profiles WHERE id = :id");
         q.bindValue(":id",id);
         q.exec();

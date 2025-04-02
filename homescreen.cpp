@@ -13,6 +13,17 @@
 void HomeScreen::logError(const QString &message)
 {
     QFile file("ErrorLogs.txt");
+    QSqlQuery query;
+    QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+    query.prepare("INSERT INTO errorLogs (timestamp, message)"
+              "VALUES (:timestamp, :message)");
+    query.bindValue(":timestamp", timestamp);
+    query.bindValue(":message", message);
+    if (!query.exec()){
+        qDebug() << "Failed to upload error online";
+    }
+    emit errorSaved();
+    qDebug() << "Reached";
     if (file.open(QIODevice::Append | QIODevice::Text))
     {
         QTextStream out(&file);

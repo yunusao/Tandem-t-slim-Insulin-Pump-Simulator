@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include <QPixmap>
 #include <QPainter>
+#include <QSqlQuery>
 
 #include "bolusscreen.h"
 #include "optionsscreen.h"
@@ -70,6 +71,9 @@ private:
     // Variables used in the graph approach.
     double baseline;
     double amplitude;
+
+signals:
+    void errorSaved();
 };
 
 #endif // HOMESCREEN_H

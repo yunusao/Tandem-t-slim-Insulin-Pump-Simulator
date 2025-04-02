@@ -1,6 +1,7 @@
 #include "optionsscreen.h"
 #include "ui_optionsscreen.h"
 #include "profilepage.h"
+#include "homescreen.h"
 
 OptionsScreen::OptionsScreen(QWidget *parent) :
     QWidget(parent),
@@ -10,6 +11,10 @@ OptionsScreen::OptionsScreen(QWidget *parent) :
     profilePage = new ProfilePage(this);
     profilePage->setWindowFlags(Qt::Window);
     profilePage->hide();
+
+    errorLogs = new errorlogpage(this);
+    errorLogs->setWindowFlags(Qt::Window);
+    errorLogs->hide();
 }
 
 OptionsScreen::~OptionsScreen()
@@ -22,3 +27,11 @@ void OptionsScreen::on_personalProfilesButton_clicked()
     this->hide();
     profilePage->show();
 }
+
+void OptionsScreen::on_pushButton_clicked()
+{
+    this->hide();
+    errorLogs->loadErrors();
+    errorLogs->show();
+}
+

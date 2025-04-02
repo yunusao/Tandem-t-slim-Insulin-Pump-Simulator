@@ -19,7 +19,7 @@ ProfilePage::~ProfilePage()
 void ProfilePage::loadProfiles() {
     ui->profilesTable->setRowCount(0);
     QSqlQuery q("SELECT * FROM profiles");
-    int row = 0;;
+    int row = 0;
     while(q.next()){
       int id = q.value("id").toInt();
       ui->profilesTable->insertRow(row);

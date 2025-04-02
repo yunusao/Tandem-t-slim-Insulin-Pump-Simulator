@@ -63,3 +63,12 @@ void BolusScreen::showInsulinDialog() {
          }
     }
 }
+
+void BolusScreen::on_backButton_clicked()
+{
+    this->hide();
+    if ( parentWidget()){
+        parentWidget()->show();
+    }
+}
+

@@ -62,7 +62,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Alerts Logo</string>
+    <string>Errors Logs</string>
    </property>
   </widget>
  </widget>

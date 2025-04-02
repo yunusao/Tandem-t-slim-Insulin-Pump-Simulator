@@ -25,6 +25,8 @@ private slots:
     void updateBG(QString value);
     void showInsulinDialog();  // New slot for manual insulin injection
 
+    void on_backButton_clicked();
+
 private:
     Ui::BolusScreen *ui;
     CarbEntryScreen *carbScreen;

@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QSqlError>
 #include <QApplication>
+#include <QObject>
 
 int main(int argc, char *argv[])
 {
@@ -26,6 +27,15 @@ int main(int argc, char *argv[])
     if (!query.exec(createTable)){
         qDebug() << "failed 2";
     }
+    QSqlQuery query2;
+    QString createTable2 = "CREATE TABLE IF NOT EXISTS errorLogs ("
+            "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+            "timestamp TEXT,"
+            "message TEXT)";
+    if (!query2.exec(createTable2)){
+        qDebug() << "failed 3s";
+    }
+
     // Dark Theme Style Sheet
     QString darkStyle = R"(
         /* General widget styling */

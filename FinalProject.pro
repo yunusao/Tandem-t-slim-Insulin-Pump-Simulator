@@ -13,6 +13,7 @@ SOURCES += \
     bolusscreen.cpp \
     carbentryscreen.cpp \
     createeditprofile.cpp \
+    errorlogpage.cpp \
     homescreen.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -24,6 +25,7 @@ HEADERS += \
     bolusscreen.h \
     carbentryscreen.h \
     createeditprofile.h \
+    errorlogpage.h \
     homescreen.h \
     mainwindow.h \
     optionsscreen.h \
@@ -34,6 +36,7 @@ FORMS += \
     bolusscreen.ui \
     carbentryscreen.ui \
     createeditprofile.ui \
+    errorlogpage.ui \
     homescreen.ui \
     mainwindow.ui \
     optionsscreen.ui \

@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "profilepage.h"
+#include "errorlogpage.h"
 
 namespace Ui {
 class OptionsScreen;
@@ -19,9 +20,14 @@ public:
 private slots:
     void on_personalProfilesButton_clicked();
 
+    void on_pushButton_clicked();
+
 private:
     Ui::OptionsScreen *ui;
     ProfilePage *profilePage;
+    errorlogpage *errorLogs;
+
+
 };
 
 #endif // OPTIONSSCREEN_H
