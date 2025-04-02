@@ -1,5 +1,7 @@
 #include "bgscreen.h"
 #include "ui_bgscreen.h"
+#include "correctionsuggestionscreen.h"
+#include <QMessageBox>  // In case you show warnings
 
 bgscreen::bgscreen(QWidget *parent) :
     QWidget(parent),
@@ -27,10 +29,29 @@ bgscreen::bgscreen(QWidget *parent) :
 
     // Confirm
     connect(ui->confirmButton, &QPushButton::clicked, this, [=]() {
-        emit bgEntered(bgInput);
-        this->hide();
-        parentWidget()->show();  // Show BolusScreen
+        bool ok;
+        float bgValue = bgInput.toFloat(&ok);
+
+        if (ok) {
+            if (bgValue >= 3.9 && bgValue < 5.0) {
+                // Use the shared correctionScreen
+                correctionScreen->setWindowFlags(Qt::Window);
+                correctionScreen->setBG(bgInput);
+                correctionScreen->setIOB("0");
+
+                correctionScreen->show();
+                this->hide();
+            } else {
+                // Normal case
+                emit bgEntered(bgInput);
+                this->hide();
+                parentWidget()->show();
+            }
+        } else {
+            QMessageBox::warning(this, "Invalid Input", "Could not interpret BG value.");
+        }
     });
+
 
     // Back
     connect(ui->backButton, &QPushButton::clicked, this, [=]() {
@@ -80,4 +101,8 @@ void bgscreen::toggleSign()
         bgInput = "-" + bgInput;
     }
     ui->labelBgValue->setText(bgInput);
+}
+
+void bgscreen::setCorrectionScreen(CorrectionSuggestionScreen *screen) {
+    correctionScreen = screen;
 }

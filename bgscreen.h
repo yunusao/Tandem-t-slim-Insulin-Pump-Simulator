@@ -2,6 +2,7 @@
 #define BGSCREEN_H
 
 #include <QWidget>
+#include "correctionsuggestionscreen.h"
 
 namespace Ui {
 class bgscreen;
@@ -14,10 +15,12 @@ class bgscreen : public QWidget
 public:
     explicit bgscreen(QWidget *parent = nullptr);
     ~bgscreen();
+    void setCorrectionScreen(CorrectionSuggestionScreen *screen);
 
 private:
     Ui::bgscreen *ui;
     QString bgInput;
+    CorrectionSuggestionScreen *correctionScreen;
 
 private slots:
     void handleDigit(const QString &digit);

@@ -14,6 +14,8 @@ SOURCES += \
     carbentryscreen.cpp \
     createeditprofile.cpp \
     errorlogpage.cpp \
+    confirmbolusscreen.cpp \
+    correctionsuggestionscreen.cpp \
     homescreen.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -26,6 +28,8 @@ HEADERS += \
     carbentryscreen.h \
     createeditprofile.h \
     errorlogpage.h \
+    confirmbolusscreen.h \
+    correctionsuggestionscreen.h \
     homescreen.h \
     mainwindow.h \
     optionsscreen.h \
@@ -37,6 +41,8 @@ FORMS += \
     carbentryscreen.ui \
     createeditprofile.ui \
     errorlogpage.ui \
+    confirmbolusscreen.ui \
+    correctionsuggestionscreen.ui \
     homescreen.ui \
     mainwindow.ui \
     optionsscreen.ui \
