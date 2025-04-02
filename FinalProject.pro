@@ -15,6 +15,8 @@ SOURCES += \
     carbentryscreen.cpp \
     confirmdeliveryscreen.cpp \
     createeditprofile.cpp \
+    delivernowinputscreen.cpp \
+    durationinputscreen.cpp \
     errorlogpage.cpp \
     confirmbolusscreen.cpp \
     correctionsuggestionscreen.cpp \
@@ -33,6 +35,8 @@ HEADERS += \
     carbentryscreen.h \
     confirmdeliveryscreen.h \
     createeditprofile.h \
+    delivernowinputscreen.h \
+    durationinputscreen.h \
     errorlogpage.h \
     confirmbolusscreen.h \
     correctionsuggestionscreen.h \
@@ -50,6 +54,8 @@ FORMS += \
     carbentryscreen.ui \
     confirmdeliveryscreen.ui \
     createeditprofile.ui \
+    delivernowinputscreen.ui \
+    durationinputscreen.ui \
     errorlogpage.ui \
     confirmbolusscreen.ui \
     correctionsuggestionscreen.ui \

@@ -2,6 +2,8 @@
 #define EXTENDEDBOLUSSCREEN_H
 
 #include <QWidget>
+#include "delivernowinputscreen.h"
+#include "durationinputscreen.h"
 
 namespace Ui {
 class ExtendedBolusScreen;
@@ -19,6 +21,8 @@ public:
 
 private:
     Ui::ExtendedBolusScreen *ui;
+    DeliverNowInputScreen *nowInputScreen;
+    DurationInputScreen *durationScreen;
 };
 
 #endif // EXTENDEDBOLUSSCREEN_H
