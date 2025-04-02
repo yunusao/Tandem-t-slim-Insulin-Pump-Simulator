@@ -9,7 +9,13 @@
 #include "ui_homescreen.h"
 #include "mainwindow.h"  // For returning to MainWindow when needed
 
-// Helper function to log errors
+/**
+ * @brief HomeScreen::logError
+ * @param message
+ *
+ * Logs errors into txtt file and inserts into database
+ *
+ */
 void HomeScreen::logError(const QString &message)
 {
     QFile file("ErrorLogs.txt");

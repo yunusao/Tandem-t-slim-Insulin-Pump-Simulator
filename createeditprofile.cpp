@@ -1,5 +1,14 @@
 #include "createeditprofile.h"
 #include "ui_createeditprofile.h"
+/**
+ * @brief CreateEditProfile::CreateEditProfile
+ * @param parent
+ * @param editProfileId
+ *
+ * This is the constructor for the profile form. It takes a profileId as the parameter. If the user is not created we set it
+ * to -1 to show that it is a new profile. The database automatically updates the id values onces it stored as thats the primary
+ * key (check main.cpp for db setup and implementation)
+ */
 
 CreateEditProfile::CreateEditProfile(QWidget *parent, int editProfileId) :
     QWidget(parent),
@@ -7,6 +16,10 @@ CreateEditProfile::CreateEditProfile(QWidget *parent, int editProfileId) :
 {
     ui->setupUi(this);
     qDebug() <<"Create"<< QSqlDatabase::database().databaseName();
+
+    //If already a user, get the id associated with that profile and populate the
+    //the input boxes with the values of the fields corressponding to that id
+    //The UI allows you to change this value even if its preset
     if (id != -1) {
         qDebug() << id;
         QSqlQuery q;
@@ -60,6 +73,12 @@ void CreateEditProfile::on_submiButton_clicked()
     }
 }
 */
+
+/**
+ * @brief CreateEditProfile::on_submiButton_clicked
+ *
+ * Saves a user in the database
+ */
 void CreateEditProfile::on_submiButton_clicked()
 {
     // Validate

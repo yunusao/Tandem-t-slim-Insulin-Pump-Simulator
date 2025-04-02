@@ -1,6 +1,10 @@
 #include "errorlogpage.h"
 #include "ui_errorlogpage.h"
 
+/**
+ * @brief errorlogpage::errorlogpage
+ * @param parent
+ */
 errorlogpage::errorlogpage(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::errorlogpage)
@@ -15,6 +19,7 @@ errorlogpage::~errorlogpage()
     delete ui;
 }
 
+
 void errorlogpage::on_backButton_clicked()
 {
     this->hide();
@@ -23,6 +28,12 @@ void errorlogpage::on_backButton_clicked()
     }
 }
 
+/**
+ * @brief errorlogpage::loadErrors
+ *
+ * Goes though every item placed in the errorLogs table and presets the value of the
+ * correspondding table widget to its db value
+ */
 void errorlogpage::loadErrors() {
     ui->errorTable->setRowCount(0);
     QSqlQuery q("SELECT * FROM errorLogs");

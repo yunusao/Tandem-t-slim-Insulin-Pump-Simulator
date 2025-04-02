@@ -16,6 +16,14 @@ ProfilePage::~ProfilePage()
     delete ui;
 }
 
+/**
+ * @brief ProfilePage::loadProfiles
+ *
+ * Goes through the profiles table  in the db and pulls all of its data for each id.
+ * Presets value of the table to whatever is pulleed from db. Id is used to match value
+ * to profile.
+ *
+ */
 void ProfilePage::loadProfiles() {
     ui->profilesTable->setRowCount(0);
     QSqlQuery q("SELECT * FROM profiles");
@@ -32,6 +40,7 @@ void ProfilePage::loadProfiles() {
       QPushButton *deleteButton = new QPushButton("Delete");
       ui->profilesTable->setCellWidget(row,5,editButton);
       ui->profilesTable->setCellWidget(row,6,deleteButton);
+
       //edit button
       connect(editButton, &QPushButton::clicked, [=]() {
           qDebug() << id;
@@ -45,6 +54,7 @@ void ProfilePage::loadProfiles() {
           editProfile->show();
       });
 
+      //delete button
       connect(deleteButton, &QPushButton::clicked,[=](){
           if(QMessageBox::question(this, "Confirm Delete","Are you sure",
                                    QMessageBox::Yes | QMessageBox::No)==QMessageBox::Yes){
