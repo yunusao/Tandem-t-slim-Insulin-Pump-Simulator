@@ -6,6 +6,7 @@ CorrectionSuggestionScreen::CorrectionSuggestionScreen(QWidget *parent) :
     ui(new Ui::CorrectionSuggestionScreen)
 {
     ui->setupUi(this);
+
     connect(ui->homeButton, &QPushButton::clicked, this, [=]() {
         this->hide();  // Hide CorrectionSuggestionScreen
 
@@ -28,6 +29,15 @@ CorrectionSuggestionScreen::CorrectionSuggestionScreen(QWidget *parent) :
         }
     });
 
+    connect(ui->cancelButton, &QPushButton::clicked, this, [=]() {
+        this->hide();  // Hide this screen
+
+        if (parentWidget()) {
+            parentWidget()->show();  // Show the BGScreen again
+        }
+    });
+
+
 }
 
 CorrectionSuggestionScreen::~CorrectionSuggestionScreen()
@@ -44,4 +54,15 @@ void CorrectionSuggestionScreen::setBG(QString bg)
 void CorrectionSuggestionScreen::setIOB(QString iob)
 {
     ui->labelIOBValue->setText(iob + " u");
+}
+
+void CorrectionSuggestionScreen::setBGMessageBasedOnValue(float bg)
+{
+    float target = 5.0;  // You can make this dynamic later if needed
+
+    if (bg < target) {
+        ui->labelMessage->setText("Your BG is Below Target\nReduce Bolus Calculation?");
+    } else {
+        ui->labelMessage->setText("Your BG is Above Target\nAdd Correction Bolus?");
+    }
 }

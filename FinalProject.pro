@@ -10,12 +10,16 @@ CONFIG += c++11
 
 SOURCES += \
     bgscreen.cpp \
+    bolusinitiatedscreen.cpp \
     bolusscreen.cpp \
     carbentryscreen.cpp \
+    confirmdeliveryscreen.cpp \
     createeditprofile.cpp \
     errorlogpage.cpp \
     confirmbolusscreen.cpp \
     correctionsuggestionscreen.cpp \
+    extendedbolusscreen.cpp \
+    finaldeliveryscreen.cpp \
     homescreen.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -24,12 +28,16 @@ SOURCES += \
 
 HEADERS += \
     bgscreen.h \
+    bolusinitiatedscreen.h \
     bolusscreen.h \
     carbentryscreen.h \
+    confirmdeliveryscreen.h \
     createeditprofile.h \
     errorlogpage.h \
     confirmbolusscreen.h \
     correctionsuggestionscreen.h \
+    extendedbolusscreen.h \
+    finaldeliveryscreen.h \
     homescreen.h \
     mainwindow.h \
     optionsscreen.h \
@@ -37,12 +45,16 @@ HEADERS += \
 
 FORMS += \
     bgscreen.ui \
+    bolusinitiatedscreen.ui \
     bolusscreen.ui \
     carbentryscreen.ui \
+    confirmdeliveryscreen.ui \
     createeditprofile.ui \
     errorlogpage.ui \
     confirmbolusscreen.ui \
     correctionsuggestionscreen.ui \
+    extendedbolusscreen.ui \
+    finaldeliveryscreen.ui \
     homescreen.ui \
     mainwindow.ui \
     optionsscreen.ui \

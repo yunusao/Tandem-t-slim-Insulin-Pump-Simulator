@@ -31,18 +31,20 @@ bgscreen::bgscreen(QWidget *parent) :
     connect(ui->confirmButton, &QPushButton::clicked, this, [=]() {
         bool ok;
         float bgValue = bgInput.toFloat(&ok);
+        float targetBG = 5.0;  // Can make this dynamic later
 
         if (ok) {
-            if (bgValue >= 3.9 && bgValue < 5.0) {
-                // Use the shared correctionScreen
+            if (bgValue != targetBG) {
+                // Show the correction screen if not exactly at target
                 correctionScreen->setWindowFlags(Qt::Window);
                 correctionScreen->setBG(bgInput);
                 correctionScreen->setIOB("0");
+                correctionScreen->setBGMessageBasedOnValue(bgValue);  // Adjust label message
 
                 correctionScreen->show();
                 this->hide();
             } else {
-                // Normal case
+                // Normal case (exactly at target)
                 emit bgEntered(bgInput);
                 this->hide();
                 parentWidget()->show();
@@ -51,7 +53,6 @@ bgscreen::bgscreen(QWidget *parent) :
             QMessageBox::warning(this, "Invalid Input", "Could not interpret BG value.");
         }
     });
-
 
     // Back
     connect(ui->backButton, &QPushButton::clicked, this, [=]() {

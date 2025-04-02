@@ -2,6 +2,8 @@
 #define CONFIRMBOLUSSCREEN_H
 
 #include <QWidget>
+#include "finaldeliveryscreen.h"
+
 
 namespace Ui {
 class ConfirmBolusScreen;
@@ -20,6 +22,7 @@ public:
 
 private:
     Ui::ConfirmBolusScreen *ui;
+    FinalDeliveryScreen *finalDeliveryScreen;
 };
 
 #endif // CONFIRMBOLUSSCREEN_H
