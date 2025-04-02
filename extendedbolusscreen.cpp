@@ -14,6 +14,11 @@ ExtendedBolusScreen::ExtendedBolusScreen(QWidget *parent) :
     durationScreen->setWindowFlags(Qt::Window);
     durationScreen->hide();
 
+    confirmExtendedBolusScreen = new ConfirmExtendedBolusScreen(this);
+    confirmExtendedBolusScreen->setWindowFlags(Qt::Window);
+    confirmExtendedBolusScreen->hide();
+
+
     connect(ui->backButton, &QPushButton::clicked, this, [=]() {
         this->hide();  // Hide this screen
 
@@ -21,6 +26,18 @@ ExtendedBolusScreen::ExtendedBolusScreen(QWidget *parent) :
             parentWidget()->show();  // Show FinalDeliveryScreen
         }
     });
+
+    connect(ui->confirmButton, &QPushButton::clicked, this, [=]() {
+        // Set summary values
+        confirmExtendedBolusScreen->setDeliverNow(ui->deliverNowButton->text());     // e.g. "60%"
+        confirmExtendedBolusScreen->setDeliverLater(ui->deliverLaterButton->text()); // e.g. "40%"
+        confirmExtendedBolusScreen->setDuration(ui->durationButton->text());         // e.g. "1:30"
+        confirmExtendedBolusScreen->setTotalUnits(ui->labelTotalUnits->text());
+
+        this->hide();
+        confirmExtendedBolusScreen->show();
+    });
+
 
     connect(ui->deliverNowButton, &QPushButton::clicked, this, [=]() {
         this->hide();

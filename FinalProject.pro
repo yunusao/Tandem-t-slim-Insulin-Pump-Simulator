@@ -14,6 +14,7 @@ SOURCES += \
     bolusscreen.cpp \
     carbentryscreen.cpp \
     confirmdeliveryscreen.cpp \
+    confirmextendedbolusscreen.cpp \
     createeditprofile.cpp \
     delivernowinputscreen.cpp \
     durationinputscreen.cpp \
@@ -22,6 +23,7 @@ SOURCES += \
     correctionsuggestionscreen.cpp \
     extendedbolusscreen.cpp \
     finaldeliveryscreen.cpp \
+    finalextendeddeliveryscreen.cpp \
     homescreen.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -34,6 +36,7 @@ HEADERS += \
     bolusscreen.h \
     carbentryscreen.h \
     confirmdeliveryscreen.h \
+    confirmextendedbolusscreen.h \
     createeditprofile.h \
     delivernowinputscreen.h \
     durationinputscreen.h \
@@ -42,6 +45,7 @@ HEADERS += \
     correctionsuggestionscreen.h \
     extendedbolusscreen.h \
     finaldeliveryscreen.h \
+    finalextendeddeliveryscreen.h \
     homescreen.h \
     mainwindow.h \
     optionsscreen.h \
@@ -53,6 +57,7 @@ FORMS += \
     bolusscreen.ui \
     carbentryscreen.ui \
     confirmdeliveryscreen.ui \
+    confirmextendedbolusscreen.ui \
     createeditprofile.ui \
     delivernowinputscreen.ui \
     durationinputscreen.ui \
@@ -61,6 +66,7 @@ FORMS += \
     correctionsuggestionscreen.ui \
     extendedbolusscreen.ui \
     finaldeliveryscreen.ui \
+    finalextendeddeliveryscreen.ui \
     homescreen.ui \
     mainwindow.ui \
     optionsscreen.ui \
