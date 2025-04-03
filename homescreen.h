@@ -7,9 +7,13 @@
 #include <QPixmap>
 #include <QPainter>
 #include <QSqlQuery>
+#include <QDebug>
+#include <QTableWidget>
+#include <QString>
 
 #include "bolusscreen.h"
 #include "optionsscreen.h"
+#include "profileservice.h"
 
 namespace Ui {
 class HomeScreen;
@@ -25,6 +29,7 @@ public:
 
 public slots:
     void manualInsulinInjection(double amount);
+    void loadActiveUser();
 
 private slots:
     void updateTime();      // Battery & IOB updates (500ms)
@@ -43,6 +48,7 @@ private slots:
     void refillInsulin();
 
     void disconnectCGM();   // Slot for Disconnect button
+
 
 private:
     void logError(const QString &message);

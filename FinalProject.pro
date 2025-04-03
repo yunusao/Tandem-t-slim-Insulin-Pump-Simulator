@@ -28,7 +28,8 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     optionsscreen.cpp \
-    profilepage.cpp
+    profilepage.cpp \
+    profileservice.cpp
 
 HEADERS += \
     bgscreen.h \
@@ -49,7 +50,8 @@ HEADERS += \
     homescreen.h \
     mainwindow.h \
     optionsscreen.h \
-    profilepage.h
+    profilepage.h \
+    profileservice.h
 
 FORMS += \
     bgscreen.ui \

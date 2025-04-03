@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "profilepage.h"
 #include "errorlogpage.h"
+class HomeScreen;
 
 namespace Ui {
 class OptionsScreen;
@@ -14,7 +15,7 @@ class OptionsScreen : public QWidget
     Q_OBJECT
 
 public:
-    explicit OptionsScreen(QWidget *parent = nullptr);
+    explicit OptionsScreen(HomeScreen *home, QWidget *parent = nullptr);
     ~OptionsScreen();
 
 private slots:
@@ -26,6 +27,7 @@ private:
     Ui::OptionsScreen *ui;
     ProfilePage *profilePage;
     errorlogpage *errorLogs;
+    HomeScreen *homeScreen;
 
 
 };

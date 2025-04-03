@@ -23,7 +23,8 @@ int main(int argc, char *argv[])
             "basalRate REAL,"
             "carbRatio REAL,"
             "correctionFactor REAL,"
-            "glucoseTarget REAL)";
+            "glucoseTarget REAL,"
+            "active INTEGER DEFAULT 0)";
     if (!query.exec(createTable)){
         qDebug() << "failed 2";
     }
@@ -34,6 +35,15 @@ int main(int argc, char *argv[])
             "message TEXT)";
     if (!query2.exec(createTable2)){
         qDebug() << "failed 3s";
+    }
+    QSqlQuery q(("SELECT id FROM profiles WHERE active = 1 LIMIT 1"));
+    if (q.exec() && q.next()) {
+        int id = q.value(0).toInt();
+        ProfileService::setId(id);
+        ProfileService::setActiveProfile(id);
+        qDebug() << "Active profile";
+    } else {
+        qDebug() << "No active";
     }
 
     // Dark Theme Style Sheet

@@ -3,12 +3,14 @@
 #include "profilepage.h"
 #include "homescreen.h"
 
-OptionsScreen::OptionsScreen(QWidget *parent) :
+OptionsScreen::OptionsScreen(HomeScreen *home, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::OptionsScreen)
+    ui(new Ui::OptionsScreen),
+    homeScreen(home)
 {
     ui->setupUi(this);
     profilePage = new ProfilePage(this);
+    connect(profilePage, &ProfilePage::newActiveProfile, homeScreen, &HomeScreen::loadActiveUser);
     profilePage->setWindowFlags(Qt::Window);
     profilePage->hide();
 

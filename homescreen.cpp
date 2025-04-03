@@ -54,13 +54,13 @@ HomeScreen::HomeScreen(QWidget *parent)
 {
     ui->setupUi(this);
     ui->powerOffOverlay->show(); // Show overlay when off
-
+    loadActiveUser();
     // Set progress bar ranges.
     ui->batteryBar->setRange(0, 100);
     ui->insulinRemainingBar->setRange(0, 300);
 
     bolusScreen = new BolusScreen(this);
-    optionsScreen = new OptionsScreen(this);
+    optionsScreen = new OptionsScreen(this,this);
 
     // Hide secondary screens.
     bolusScreen->hide();
@@ -346,3 +346,25 @@ void HomeScreen::disconnectCGM()
         "CGM disconnection trigger detected. Insulin delivery suspended. Please check your CGM connection and press 'OK' once connected.");
     logError("CGM Disconnection: Insulin delivery suspended. Check CGM connection.");
 }
+
+void HomeScreen::loadActiveUser() {
+    ui->activeUserTable->clearContents();
+    ui->activeUserTable->setColumnCount(5);
+    ui->activeUserTable->setRowCount(1);
+
+    if (ProfileService::getId() == -1) {
+        ui->activeUserTable->setRowCount(0);
+    }
+    ui->activeUserTable->setItem(0,0, new QTableWidgetItem(ProfileService::getField(ProfileService::Name).toString()));
+    ui->activeUserTable->setItem(0, 1, new QTableWidgetItem(QString::number(ProfileService::getField(ProfileService::BasalRate).toDouble())));
+    ui->activeUserTable->setItem(0, 2, new QTableWidgetItem(QString::number(ProfileService::getField(ProfileService::CarbRatio).toDouble())));
+    ui->activeUserTable->setItem(0, 3, new QTableWidgetItem(QString::number(ProfileService::getField(ProfileService::CorrectionFactor).toDouble())));
+    ui->activeUserTable->setItem(0, 4, new QTableWidgetItem(QString::number(ProfileService::getField(ProfileService::GlucoseTarget).toDouble())));
+    ui->activeUserTable->resizeColumnToContents(0);
+    ui->activeUserTable->resizeColumnToContents(1);
+    ui->activeUserTable->resizeColumnToContents(2);
+    ui->activeUserTable->resizeColumnToContents(3);
+    ui->activeUserTable->resizeColumnToContents(4);
+}
+
+

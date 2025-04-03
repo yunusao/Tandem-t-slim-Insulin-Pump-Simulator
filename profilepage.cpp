@@ -62,10 +62,24 @@ void ProfilePage::loadProfiles() {
               del.prepare("DELETE FROM profiles WHERE id=:id");
               del.bindValue(":id",id);
               del.exec();
+              ProfileService::setActiveProfile(0);
+              emit newActiveProfile();
               loadProfiles();
           }
       });
-      row++;
+     if (q.value("active").toInt() == 1) {
+         QLabel *label = new QLabel("Active");
+         label->setAlignment(Qt::AlignCenter);
+         ui->profilesTable->setCellWidget(row,7,label);
+     } else {
+        QPushButton *activeButton = new QPushButton("Set Active");
+        connect(activeButton,&QPushButton::clicked, [=]() {
+            ProfileService::setActiveProfile(id);
+            emit newActiveProfile();
+            loadProfiles();
+        });
+        ui->profilesTable->setCellWidget(row,7,activeButton);
+     }
     }
 
 
@@ -91,4 +105,6 @@ void ProfilePage::on_backButton_clicked()
     }
 
 }
+
+
 

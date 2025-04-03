@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QSqlQuery>
 #include <QDebug>
+#include "profileservice.h"
 
 
 
@@ -21,10 +22,14 @@ public:
     explicit ProfilePage(QWidget *parent = nullptr);
     ~ProfilePage();
 
+signals:
+    void newActiveProfile();
+
 private slots:
     void on_createProfileButton_clicked();
 
     void on_backButton_clicked();
+
 
 private:
     Ui::ProfilePage *ui;
