@@ -21,6 +21,7 @@ SOURCES += \
     errorlogpage.cpp \
     confirmbolusscreen.cpp \
     correctionsuggestionscreen.cpp \
+    extendedbolusinitiatedscreen.cpp \
     extendedbolusscreen.cpp \
     finaldeliveryscreen.cpp \
     finalextendeddeliveryscreen.cpp \
@@ -44,6 +45,7 @@ HEADERS += \
     errorlogpage.h \
     confirmbolusscreen.h \
     correctionsuggestionscreen.h \
+    extendedbolusinitiatedscreen.h \
     extendedbolusscreen.h \
     finaldeliveryscreen.h \
     finalextendeddeliveryscreen.h \
@@ -66,6 +68,7 @@ FORMS += \
     errorlogpage.ui \
     confirmbolusscreen.ui \
     correctionsuggestionscreen.ui \
+    extendedbolusinitiatedscreen.ui \
     extendedbolusscreen.ui \
     finaldeliveryscreen.ui \
     finalextendeddeliveryscreen.ui \

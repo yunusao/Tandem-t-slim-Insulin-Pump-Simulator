@@ -2,6 +2,7 @@
 #define FINALEXTENDEDDELIVERYSCREEN_H
 
 #include <QWidget>
+#include "extendedbolusinitiatedscreen.h"
 
 namespace Ui {
 class FinalExtendedDeliveryScreen;
@@ -22,6 +23,7 @@ public:
 
 private:
     Ui::FinalExtendedDeliveryScreen *ui;
+    ExtendedBolusInitiatedScreen *extendedBolusInitiatedScreen;
 };
 
 #endif // FINALEXTENDEDDELIVERYSCREEN_H
