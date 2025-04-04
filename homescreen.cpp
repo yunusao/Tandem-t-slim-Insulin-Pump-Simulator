@@ -39,6 +39,7 @@ void HomeScreen::logError(const QString &message)
     }
 }
 
+
 HomeScreen::HomeScreen(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::HomeScreen)
@@ -362,6 +363,10 @@ void HomeScreen::manualInsulinInjection(double amount)
     // Increase the insulin on board.
     insulinOnBoard += amount;
     ui->label_2->setText(QString::number(insulinOnBoard, 'f', 1) + " u");
+
+    // Log the bolus event
+    QString msg = QString("Bolus: Manual insulin injection of %1U delivered").arg(amount, 0, 'f', 1);
+    logError(msg);
 }
 
 // New slot for Disconnect button.

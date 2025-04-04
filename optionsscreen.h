@@ -25,6 +25,7 @@ private slots:
 
     void on_pushButton_clicked();
     void on_suspendResumeButton_clicked();   // New slot for basal toggle button
+    void on_eventLogButton_clicked();
 
 
 private:

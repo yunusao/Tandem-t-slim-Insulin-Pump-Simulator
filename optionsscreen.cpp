@@ -63,3 +63,12 @@ void OptionsScreen::on_suspendResumeButton_clicked()
                                  "Basal insulin delivery has been resumed.");
     }
 }
+
+// File: optionsscreen.cpp
+void OptionsScreen::on_eventLogButton_clicked()
+{
+    this->hide();
+    // Refresh and show the event log page
+    errorLogs->loadErrors();
+    errorLogs->show();
+}
