@@ -26,6 +26,10 @@ class HomeScreen : public QWidget
 public:
     explicit HomeScreen(QWidget *parent = nullptr);
     ~HomeScreen();
+    bool isBasalActive() const;            // Check basal status
+    void suspendBasal(bool logEvent = true, const QString &reason = "Basal insulin delivery suspended.");
+    void resumeBasal(bool logEvent = true, const QString &reason = "Basal insulin delivery resumed.");
+
 
 public slots:
     void manualInsulinInjection(double amount);
@@ -77,6 +81,7 @@ private:
     // Variables used in the graph approach.
     double baseline;
     double amplitude;
+    bool basalActive;  // Track if basal delivery is active (true) or suspended (false)
 
 signals:
     void errorSaved();

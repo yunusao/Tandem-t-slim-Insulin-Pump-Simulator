@@ -17,11 +17,15 @@ class OptionsScreen : public QWidget
 public:
     explicit OptionsScreen(HomeScreen *home, QWidget *parent = nullptr);
     ~OptionsScreen();
+    void updateBasalButtonLabel();  // New helper to set suspend/resume button text
+
 
 private slots:
     void on_personalProfilesButton_clicked();
 
     void on_pushButton_clicked();
+    void on_suspendResumeButton_clicked();   // New slot for basal toggle button
+
 
 private:
     Ui::OptionsScreen *ui;

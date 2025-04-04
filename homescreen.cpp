@@ -51,16 +51,19 @@ HomeScreen::HomeScreen(QWidget *parent)
     , cgmTimeTick(0)
     , poweredOn(false)      // Device starts powered off
     , batteryCounter(0)
+    , basalActive(true)     // Basal insulin delivery is active by default
 {
     ui->setupUi(this);
     ui->powerOffOverlay->show(); // Show overlay when off
+
     loadActiveUser();
+
     // Set progress bar ranges.
     ui->batteryBar->setRange(0, 100);
     ui->insulinRemainingBar->setRange(0, 300);
 
     bolusScreen = new BolusScreen(this);
-    optionsScreen = new OptionsScreen(this,this);
+    optionsScreen = new OptionsScreen(this, this);
 
     // Hide secondary screens.
     bolusScreen->hide();
@@ -72,11 +75,9 @@ HomeScreen::HomeScreen(QWidget *parent)
     connect(bolusScreen->findChild<QPushButton*>("homeButton"), &QPushButton::clicked, this, &HomeScreen::returnHome);
     connect(optionsScreen->findChild<QPushButton*>("homeButton"), &QPushButton::clicked, this, &HomeScreen::returnHome);
 
-    // Connect power on button (powerButton_2).
+    // Connect power buttons.
     connect(ui->powerButton_2, &QPushButton::pressed, this, &HomeScreen::powerPressed);
     connect(ui->powerButton_2, &QPushButton::released, this, &HomeScreen::powerReleased);
-
-    // Connect dedicated power off button (powerButton_3).
     connect(ui->powerButton_3, &QPushButton::clicked, this, &HomeScreen::powerOff);
 
     // Connect the Disconnect button.
@@ -95,7 +96,7 @@ HomeScreen::HomeScreen(QWidget *parent)
     // Initialize lastGraphY to the vertical center of the graph.
     lastGraphY = ui->graph->height() / 2;
 
-    // Initialize our new variables.
+    // Initialize glucose simulation variables.
     baseline = 5.0;
     amplitude = 1.0;
 
@@ -103,6 +104,7 @@ HomeScreen::HomeScreen(QWidget *parent)
     connect(ui->chargingButton, &QPushButton::clicked, this, &HomeScreen::toggleChargingMode);
     connect(ui->refillButton, &QPushButton::clicked, this, &HomeScreen::refillInsulin);
 }
+
 
 HomeScreen::~HomeScreen()
 {
@@ -194,20 +196,20 @@ void HomeScreen::updateTime()
 void HomeScreen::updateGraph()
 {
     if (poweredOn) {
+        // Initialize the CGM graph if needed
         if (cgmPixmap.isNull()) {
             QSize size = ui->graph->size();
             cgmPixmap = QPixmap(size);
-            // Fill with dark background.
-            cgmPixmap.fill(QColor("#1e1e1e"));
+            cgmPixmap.fill(QColor("#1e1e1e"));  // Dark background
         }
-        // Scroll the current pixmap left by 1 pixel.
+
+        // Scroll graph left by 1 pixel
         QPixmap scrolled = cgmPixmap.copy(1, 0, cgmPixmap.width() - 1, cgmPixmap.height());
-        // Fill with dark background.
         cgmPixmap.fill(QColor("#1e1e1e"));
         QPainter painter(&cgmPixmap);
         painter.drawPixmap(0, 0, scrolled);
 
-        // Deterministic up-and-down variation for both baseline and amplitude.
+        // Simulate glucose variation using sine wave and dynamic baseline/amplitude
         static bool baselineGoingUp = true;
         static bool amplitudeGoingUp = true;
         double baselineStep = 0.005;
@@ -231,12 +233,17 @@ void HomeScreen::updateGraph()
         double fastSine = std::sin(t);
         double newValue = baseline + fastSine * amplitude;
 
-        if (newValue < 3.9) newValue = 3.9;
+        bool belowThreshold = false;
+        if (newValue < 3.9) {
+            belowThreshold = true;
+            newValue = 3.9;  // Clamp minimum for display
+        }
         if (newValue > 10.0) newValue = 10.0;
 
-        // Update the current blood glucose label.
+        // Update glucose value display
         ui->currentBldGlu->setText(QString::number(newValue, 'f', 1));
 
+        // Calculate new graph y-position
         int graphHeight = cgmPixmap.height();
         int yPos = graphHeight - static_cast<int>(((newValue - 3.9) / (10.0 - 3.9)) * graphHeight);
 
@@ -245,16 +252,33 @@ void HomeScreen::updateGraph()
         if (yPos < 0) yPos = 0;
         if (yPos >= graphHeight) yPos = graphHeight - 1;
 
+        // Draw line from last point to new point
         painter.setPen(Qt::white);
         painter.drawLine(cgmPixmap.width() - 2, lastGraphY, cgmPixmap.width() - 1, yPos);
         painter.end();
-        ui->graph->setPixmap(cgmPixmap);
 
+        ui->graph->setPixmap(cgmPixmap);
         lastGraphY = yPos;
         cgmTimeTick++;
+
+        // ---- Auto-Suspend Basal Logic ----
+        static bool autoSuspendAlertShown = false;
+        if (belowThreshold && basalActive) {
+            suspendBasal(true, "Basal insulin delivery suspended automatically (low CGM < 3.9)");
+            if (!autoSuspendAlertShown) {
+                QMetaObject::invokeMethod(this, [this]() {
+                    QMessageBox::warning(this, "Auto Suspend",
+                        "Glucose fell below 3.9 mmol/L.\nBasal insulin delivery has been SUSPENDED automatically.");
+                }, Qt::QueuedConnection);
+                autoSuspendAlertShown = true;
+            }
+        } else if (!belowThreshold) {
+            autoSuspendAlertShown = false;
+        }
     }
     // When off, graphTimer is stopped so no updates occur.
 }
+
 
 void HomeScreen::powerPressed()
 {
@@ -298,6 +322,7 @@ void HomeScreen::showBolusScreen()
 void HomeScreen::showOptionsScreen()
 {
     this->hide();
+    optionsScreen->updateBasalButtonLabel();  // Set correct text based on current basalActive state
     optionsScreen->setWindowFlags(Qt::Window);
     optionsScreen->show();
 }
@@ -345,6 +370,8 @@ void HomeScreen::disconnectCGM()
     QMessageBox::warning(this, "CGM Disconnection",
         "CGM disconnection trigger detected. Insulin delivery suspended. Please check your CGM connection and press 'OK' once connected.");
     logError("CGM Disconnection: Insulin delivery suspended. Check CGM connection.");
+    suspendBasal(false);  // suspend basal (do not log again because we already logged above)
+
 }
 
 void HomeScreen::loadActiveUser() {
@@ -367,4 +394,28 @@ void HomeScreen::loadActiveUser() {
     ui->activeUserTable->resizeColumnToContents(4);
 }
 
+bool HomeScreen::isBasalActive() const {
+    return basalActive;
+}
+
+void HomeScreen::suspendBasal(bool logEvent, const QString &reason) {
+    if (!basalActive)
+        return;
+    basalActive = false;
+    if (logEvent) {
+        logError(reason);
+    }
+    // (In a real pump, we would also stop basal insulin delivery here.
+    // In this simulation, basalActive=false will signal other logic to halt any automatic basal infusion.)
+}
+
+void HomeScreen::resumeBasal(bool logEvent, const QString &reason) {
+    if (basalActive)
+        return;
+    basalActive = true;
+    if (logEvent) {
+        logError(reason);
+    }
+    // (Restore previous basal rate delivery. Here we simply re-enable any basal simulation if applicable.)
+}
 
