@@ -47,9 +47,13 @@ void ProfilePage::loadProfiles() {
 
           CreateEditProfile *editProfile = new CreateEditProfile(this, id);
           editProfile->setWindowFlags(Qt::Window);
-
-          connect(editProfile, &CreateEditProfile::profileSaved, this, &ProfilePage::loadProfiles);  // ✅ Add this line
-
+                  connect(editProfile, &CreateEditProfile::profileSaved, this, [=]() {
+                  loadProfiles();
+                  if (ProfileService::getId() == id) {
+                      qDebug() << "Update active";
+                      emit newActiveProfile();
+                  }
+          });
           this->hide();
           editProfile->show();
       });
