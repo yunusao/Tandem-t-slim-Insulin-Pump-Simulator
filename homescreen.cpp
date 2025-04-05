@@ -4,41 +4,60 @@
 #include <QRandomGenerator>
 #include <QFile>
 #include <QTextStream>
+#include <QSqlQuery>
+#include <QSqlError>
 #include <algorithm>
 #include "homescreen.h"
 #include "ui_homescreen.h"
 #include "mainwindow.h"  // For returning to MainWindow when needed
 
-/**
- * @brief HomeScreen::logError
- * @param message
- *
- * Logs errors into txtt file and inserts into database
- *
- */
+// Helper function to log errors
 void HomeScreen::logError(const QString &message)
 {
-    QFile file("ErrorLogs.txt");
+    // Log error to database
     QSqlQuery query;
     QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-    query.prepare("INSERT INTO errorLogs (timestamp, message)"
-              "VALUES (:timestamp, :message)");
+    query.prepare("INSERT INTO errorLogs (timestamp, message) VALUES (:timestamp, :message)");
     query.bindValue(":timestamp", timestamp);
     query.bindValue(":message", message);
     if (!query.exec()){
-        qDebug() << "Failed to upload error online";
+        qDebug() << "Failed to log error to database:" << query.lastError().text();
     }
     emit errorSaved();
-    qDebug() << "Reached";
+
+    // Also log to file
+    QFile file("ErrorLogs.txt");
     if (file.open(QIODevice::Append | QIODevice::Text))
     {
         QTextStream out(&file);
-        out << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-            << " - " << message << "\n";
+        out << timestamp << " - " << message << "\n";
         file.close();
     }
 }
 
+// deliverBolus: if durationMs == 0, deliver immediately; otherwise, schedule an extended delivery.
+void HomeScreen::deliverBolus(double units, int durationMs)
+{
+    if (durationMs <= 0) {
+        if (units > insulinRemainingUnits)
+            units = insulinRemainingUnits;
+        insulinRemainingUnits -= units;
+        insulinOnBoard += units;
+        ui->insulinRemainingBar->setValue(insulinRemainingUnits);
+        ui->insulinRemaining->setText(QString::number(insulinRemainingUnits) + "U");
+        ui->label_2->setText(QString::number(insulinOnBoard, 'f', 1) + " u");
+        logError(QString("Immediate bolus: %1 U delivered.").arg(units, 0, 'f', 1));
+    } else {
+        BolusDelivery bolus;
+        bolus.totalUnits = units;
+        bolus.remainingUnits = units;
+        bolus.durationMs = durationMs;
+        bolus.startTime = QDateTime::currentDateTime();
+        bolus.rate = units / static_cast<double>(durationMs); // units per ms
+        activeBoluses.append(bolus);
+        logError(QString("Extended bolus: %1 U over %2 ms scheduled.").arg(units, 0, 'f', 1).arg(durationMs));
+    }
+}
 
 HomeScreen::HomeScreen(QWidget *parent)
     : QWidget(parent)
@@ -52,7 +71,7 @@ HomeScreen::HomeScreen(QWidget *parent)
     , cgmTimeTick(0)
     , poweredOn(false)      // Device starts powered off
     , batteryCounter(0)
-    , basalActive(true)     // Basal insulin delivery is active by default
+    , basalActive(true)     // Basal delivery active by default
 {
     ui->setupUi(this);
     ui->powerOffOverlay->show(); // Show overlay when off
@@ -84,7 +103,7 @@ HomeScreen::HomeScreen(QWidget *parent)
     // Connect the Disconnect button.
     connect(ui->Disconnect, &QPushButton::clicked, this, &HomeScreen::disconnectCGM);
 
-    // Set timer intervals (do not start them yet).
+    // Set timer intervals.
     timer->setInterval(500);
     connect(timer, &QTimer::timeout, this, &HomeScreen::updateTime);
 
@@ -97,7 +116,7 @@ HomeScreen::HomeScreen(QWidget *parent)
     // Initialize lastGraphY to the vertical center of the graph.
     lastGraphY = ui->graph->height() / 2;
 
-    // Initialize glucose simulation variables.
+    // Initialize simulation variables.
     baseline = 5.0;
     amplitude = 1.0;
 
@@ -106,7 +125,6 @@ HomeScreen::HomeScreen(QWidget *parent)
     connect(ui->refillButton, &QPushButton::clicked, this, &HomeScreen::refillInsulin);
 }
 
-
 HomeScreen::~HomeScreen()
 {
     delete ui;
@@ -114,13 +132,11 @@ HomeScreen::~HomeScreen()
 
 void HomeScreen::updateTime()
 {
-    // Update time and date display.
     QTime time = QTime::currentTime();
     QDate date = QDate::currentDate();
     ui->labelTime->setText(time.toString("hh:mm AP"));
     ui->labelDate->setText(date.toString("dd MMM"));
 
-    // Update the elapsed time since power-on.
     if (poweredOn) {
         int elapsedMs = powerOnTime.msecsTo(QDateTime::currentDateTime());
         QTime elapsed = QTime::fromMSecsSinceStartOfDay(elapsedMs);
@@ -129,10 +145,9 @@ void HomeScreen::updateTime()
         ui->timeWindow->setText("0:00:00");
     }
 
-    // Update battery and IOB only when the device is on.
     if (poweredOn) {
         batteryCounter++;
-        if (batteryCounter % 4 == 0) {  // Every 2 seconds.
+        if (batteryCounter % 4 == 0) {
             if (!chargingMode)
                 batteryLevel = std::max(0, batteryLevel - 1);
             else
@@ -141,19 +156,36 @@ void HomeScreen::updateTime()
         ui->batteryBar->setValue(batteryLevel);
         ui->batteryLabel->setText(QString::number(batteryLevel) + "%");
 
+        // Process active extended bolus deliveries.
+        double dt = 500.0; // ms per tick
+        for (int i = activeBoluses.size() - 1; i >= 0; i--) {
+            BolusDelivery &bolus = activeBoluses[i];
+            double delivered = bolus.rate * dt;
+            if (delivered > bolus.remainingUnits)
+                delivered = bolus.remainingUnits;
+            bolus.remainingUnits -= delivered;
+            insulinOnBoard += delivered;
+            insulinRemainingUnits -= delivered;
+            if (insulinRemainingUnits < 0)
+                insulinRemainingUnits = 0;
+            ui->insulinRemainingBar->setValue(insulinRemainingUnits);
+            ui->insulinRemaining->setText(QString::number(insulinRemainingUnits) + "U");
+            ui->label_2->setText(QString::number(insulinOnBoard, 'f', 1) + " u");
+            if (bolus.remainingUnits <= 0)
+                activeBoluses.removeAt(i);
+        }
+
         if (insulinOnBoard > 0) {
-            // Decay insulin on board at 1/4th of previous rate.
             insulinOnBoard = std::max(0.0, insulinOnBoard - 0.125);
             ui->label_2->setText(QString::number(insulinOnBoard, 'f', 1) + " u");
         }
 
-        // --- Error Handling for Battery ---
         static bool batteryLowAlertShown = false;
         if (batteryLevel <= 20 && batteryLevel > 0) {
             if (!batteryLowAlertShown) {
-                QTimer::singleShot(0, this, [this](){
+                QMetaObject::invokeMethod(this, [this](){
                     QMessageBox::warning(this, "Low Battery", "Battery is low. Please charge the device.");
-                });
+                }, Qt::QueuedConnection);
                 logError("Low Battery: Battery level at " + QString::number(batteryLevel) + "%. Please charge the device.");
                 batteryLowAlertShown = true;
             }
@@ -161,19 +193,18 @@ void HomeScreen::updateTime()
             batteryLowAlertShown = false;
         }
         if (batteryLevel == 0) {
-            QTimer::singleShot(0, this, [this](){
+            QMetaObject::invokeMethod(this, [this](){
                 QMessageBox::warning(this, "Battery Depleted", "Battery depleted. Device powering off.");
-            });
-            logError("Battery Depleted: Battery level reached 0%. Device powering off. To continue pumping, please charge. Contact support at 613-807-9580");
+            }, Qt::QueuedConnection);
+            logError("Battery Depleted: Battery level reached 0%. Device powering off.");
             powerOff();
         }
 
-        // --- Error Handling for Insulin ---
         static bool insulinLowAlertShown = false;
         if (insulinRemainingUnits <= 60) {
             if (!insulinLowAlertShown) {
-                QMetaObject::invokeMethod(QApplication::activeWindow(), [this]() {
-                    QMessageBox::warning(QApplication::activeWindow(), "Low Insulin", "Insulin cartridge is low. Please refill your insulin cartridge.");
+                QMetaObject::invokeMethod(this, [this](){
+                    QMessageBox::warning(this, "Low Insulin", "Insulin cartridge is low. Please refill your insulin cartridge.");
                 }, Qt::QueuedConnection);
                 logError("Low Insulin: Insulin remaining at " + QString::number(insulinRemainingUnits) + "U. Please refill the cartridge.");
                 insulinLowAlertShown = true;
@@ -181,9 +212,7 @@ void HomeScreen::updateTime()
         } else {
             insulinLowAlertShown = false;
         }
-    }
-    else {
-        // When off, battery updates are paused unless charging.
+    } else {
         if (chargingMode) {
             batteryCounter++;
             if (batteryCounter % 4 == 0)
@@ -197,20 +226,16 @@ void HomeScreen::updateTime()
 void HomeScreen::updateGraph()
 {
     if (poweredOn) {
-        // Initialize the CGM graph if needed
         if (cgmPixmap.isNull()) {
             QSize size = ui->graph->size();
             cgmPixmap = QPixmap(size);
-            cgmPixmap.fill(QColor("#1e1e1e"));  // Dark background
+            cgmPixmap.fill(QColor("#1e1e1e"));
         }
-
-        // Scroll graph left by 1 pixel
         QPixmap scrolled = cgmPixmap.copy(1, 0, cgmPixmap.width() - 1, cgmPixmap.height());
         cgmPixmap.fill(QColor("#1e1e1e"));
         QPainter painter(&cgmPixmap);
         painter.drawPixmap(0, 0, scrolled);
 
-        // Simulate glucose variation using sine wave and dynamic baseline/amplitude
         static bool baselineGoingUp = true;
         static bool amplitudeGoingUp = true;
         double baselineStep = 0.005;
@@ -233,53 +258,28 @@ void HomeScreen::updateGraph()
         double t = cgmTimeTick / 10.0;
         double fastSine = std::sin(t);
         double newValue = baseline + fastSine * amplitude;
-
-        bool belowThreshold = false;
-        if (newValue < 3.9) {
-            belowThreshold = true;
-            newValue = 3.9;  // Clamp minimum for display
-        }
+        if (newValue < 3.9) newValue = 3.9;
         if (newValue > 10.0) newValue = 10.0;
 
-        // Update glucose value display
         ui->currentBldGlu->setText(QString::number(newValue, 'f', 1));
 
-        // Calculate new graph y-position
         int graphHeight = cgmPixmap.height();
         int yPos = graphHeight - static_cast<int>(((newValue - 3.9) / (10.0 - 3.9)) * graphHeight);
 
-        int noise = QRandomGenerator::global()->bounded(5u) - 2; // [-2,2]
+        int noise = QRandomGenerator::global()->bounded(5u) - 2;
         yPos += noise;
         if (yPos < 0) yPos = 0;
         if (yPos >= graphHeight) yPos = graphHeight - 1;
 
-        // Draw line from last point to new point
         painter.setPen(Qt::white);
         painter.drawLine(cgmPixmap.width() - 2, lastGraphY, cgmPixmap.width() - 1, yPos);
         painter.end();
-
         ui->graph->setPixmap(cgmPixmap);
+
         lastGraphY = yPos;
         cgmTimeTick++;
-
-        // ---- Auto-Suspend Basal Logic ----
-        static bool autoSuspendAlertShown = false;
-        if (belowThreshold && basalActive) {
-            suspendBasal(true, "Basal insulin delivery suspended automatically (low CGM < 3.9)");
-            if (!autoSuspendAlertShown) {
-                QMetaObject::invokeMethod(this, [this]() {
-                    QMessageBox::warning(this, "Auto Suspend",
-                        "Glucose fell below 3.9 mmol/L.\nBasal insulin delivery has been SUSPENDED automatically.");
-                }, Qt::QueuedConnection);
-                autoSuspendAlertShown = true;
-            }
-        } else if (!belowThreshold) {
-            autoSuspendAlertShown = false;
-        }
     }
-    // When off, graphTimer is stopped so no updates occur.
 }
-
 
 void HomeScreen::powerPressed()
 {
@@ -288,7 +288,6 @@ void HomeScreen::powerPressed()
 
 void HomeScreen::powerReleased()
 {
-    // This slot is for powerButton_2 (power on)
     int duration = pressStartTime.msecsTo(QDateTime::currentDateTime());
     if (!poweredOn) {
         if (duration >= 3000) {
@@ -306,11 +305,9 @@ void HomeScreen::powerReleased()
 
 void HomeScreen::powerOff()
 {
-    // This slot is for powerButton_3 (power off).
     poweredOn = false;
     ui->powerOffOverlay->show();
     graphTimer->stop();
-    // Battery timer remains running so that, if charging is active, the battery level can still update.
 }
 
 void HomeScreen::showBolusScreen()
@@ -323,7 +320,7 @@ void HomeScreen::showBolusScreen()
 void HomeScreen::showOptionsScreen()
 {
     this->hide();
-    optionsScreen->updateBasalButtonLabel();  // Set correct text based on current basalActive state
+    optionsScreen->updateBasalButtonLabel();
     optionsScreen->setWindowFlags(Qt::Window);
     optionsScreen->show();
 }
@@ -338,10 +335,7 @@ void HomeScreen::returnHome()
 void HomeScreen::toggleChargingMode()
 {
     chargingMode = !chargingMode;
-    if (chargingMode)
-        ui->chargingButton->setText("Stop Charging");
-    else
-        ui->chargingButton->setText("Start Charging");
+    ui->chargingButton->setText(chargingMode ? "Stop Charging" : "Start Charging");
 }
 
 void HomeScreen::refillInsulin()
@@ -353,41 +347,51 @@ void HomeScreen::refillInsulin()
 
 void HomeScreen::manualInsulinInjection(double amount)
 {
-    // If amount is greater than available, limit it.
-    if (amount > insulinRemainingUnits)
-        amount = insulinRemainingUnits;
-    // Decrease the available insulin.
-    insulinRemainingUnits -= static_cast<int>(amount);
-    ui->insulinRemainingBar->setValue(insulinRemainingUnits);
-    ui->insulinRemaining->setText(QString::number(insulinRemainingUnits) + "U");
-    // Increase the insulin on board.
-    insulinOnBoard += amount;
-    ui->label_2->setText(QString::number(insulinOnBoard, 'f', 1) + " u");
-
-    // Log the bolus event
-    QString msg = QString("Bolus: Manual insulin injection of %1U delivered").arg(amount, 0, 'f', 1);
-    logError(msg);
+    deliverBolus(amount, 0);
 }
 
-// New slot for Disconnect button.
 void HomeScreen::disconnectCGM()
 {
     QMessageBox::warning(this, "CGM Disconnection",
         "CGM disconnection trigger detected. Insulin delivery suspended. Please check your CGM connection and press 'OK' once connected.");
     logError("CGM Disconnection: Insulin delivery suspended. Check CGM connection.");
-    suspendBasal(false);  // suspend basal (do not log again because we already logged above)
-
+    suspendBasal();
 }
 
-void HomeScreen::loadActiveUser() {
+bool HomeScreen::isBasalActive() const
+{
+    return basalActive;
+}
+
+void HomeScreen::suspendBasal(bool logEvent, const QString &reason)
+{
+    if (!basalActive)
+        return;
+    basalActive = false;
+    if (logEvent)
+        logError(reason);
+}
+
+void HomeScreen::resumeBasal(bool logEvent, const QString &reason)
+{
+    if (basalActive)
+        return;
+    basalActive = true;
+    if (logEvent)
+        logError(reason);
+}
+
+void HomeScreen::loadActiveUser()
+{
     ui->activeUserTable->clearContents();
     ui->activeUserTable->setColumnCount(5);
     ui->activeUserTable->setRowCount(1);
 
     if (ProfileService::getId() == -1) {
         ui->activeUserTable->setRowCount(0);
+        return;
     }
-    ui->activeUserTable->setItem(0,0, new QTableWidgetItem(ProfileService::getField(ProfileService::Name).toString()));
+    ui->activeUserTable->setItem(0, 0, new QTableWidgetItem(ProfileService::getField(ProfileService::Name).toString()));
     ui->activeUserTable->setItem(0, 1, new QTableWidgetItem(QString::number(ProfileService::getField(ProfileService::BasalRate).toDouble())));
     ui->activeUserTable->setItem(0, 2, new QTableWidgetItem(QString::number(ProfileService::getField(ProfileService::CarbRatio).toDouble())));
     ui->activeUserTable->setItem(0, 3, new QTableWidgetItem(QString::number(ProfileService::getField(ProfileService::CorrectionFactor).toDouble())));
@@ -398,29 +402,3 @@ void HomeScreen::loadActiveUser() {
     ui->activeUserTable->resizeColumnToContents(3);
     ui->activeUserTable->resizeColumnToContents(4);
 }
-
-bool HomeScreen::isBasalActive() const {
-    return basalActive;
-}
-
-void HomeScreen::suspendBasal(bool logEvent, const QString &reason) {
-    if (!basalActive)
-        return;
-    basalActive = false;
-    if (logEvent) {
-        logError(reason);
-    }
-    // (In a real pump, we would also stop basal insulin delivery here.
-    // In this simulation, basalActive=false will signal other logic to halt any automatic basal infusion.)
-}
-
-void HomeScreen::resumeBasal(bool logEvent, const QString &reason) {
-    if (basalActive)
-        return;
-    basalActive = true;
-    if (logEvent) {
-        logError(reason);
-    }
-    // (Restore previous basal rate delivery. Here we simply re-enable any basal simulation if applicable.)
-}
-
