@@ -39,7 +39,7 @@ CarbEntryScreen::CarbEntryScreen(QWidget *parent) :
 
     // Clear and +/- buttons
     connect(ui->btnClear, &QPushButton::clicked, this, &CarbEntryScreen::clearInput);
-    connect(ui->btnPlusMinus, &QPushButton::clicked, this, &CarbEntryScreen::toggleSign);
+    connect(ui->btnDecimal, &QPushButton::clicked, this, &CarbEntryScreen::toggleDecimalPoint);
 
     //Back button
     connect(ui->backButton, &QPushButton::clicked, this, [=]() {
@@ -79,12 +79,14 @@ void CarbEntryScreen::clearInput()
     ui->labelCarbValue->setText(carbInput);
 }
 
-void CarbEntryScreen::toggleSign()
+void CarbEntryScreen::toggleDecimalPoint()
 {
-    if (carbInput.startsWith("-")) {
-        carbInput.remove(0, 1);
-    } else if (carbInput != "0") {
-        carbInput = "-" + carbInput;
-    }
-    ui->labelCarbValue->setText(carbInput);
+    if (!carbInput.contains('.')) {
+            if (carbInput.isEmpty()) {
+                carbInput = "0.";  // Start with "0." if input is empty
+            } else {
+                carbInput += ".";
+            }
+            ui->labelCarbValue->setText(carbInput);
+        }
 }

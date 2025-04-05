@@ -66,5 +66,9 @@ void FinalDeliveryScreen::updateTitle()
 void FinalDeliveryScreen::setFood(QString food)
 {
     valueFood = food;
-    ui->labelFood->setText(food + " u");
+    ui->valueFood->setText(food);
+}
+
+void FinalDeliveryScreen::setCorrection(QString value){
+    ui->valueCorrection->setText(value);
 }
