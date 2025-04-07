@@ -52,6 +52,7 @@ HomeScreen::HomeScreen(QWidget *parent)
     , cgmTimeTick(0)
     , poweredOn(false)      // Device starts powered off
     , batteryCounter(0)
+    , basalActive(true)
 {
     ui->setupUi(this);
     ui->powerOffOverlay->show(); // Show overlay when off
@@ -150,7 +151,7 @@ void HomeScreen::updateTime()
                 durationLogged = true;
             }
             if (insulinOnBoard > 0.0) {
-                durationLogged = false;  
+                durationLogged = false;
             }
         }
 
@@ -269,6 +270,25 @@ void HomeScreen::updateGraph()
 
         lastGraphY = yPos;
         cgmTimeTick++;
+
+
+        static bool autoSuspendAlertShown = false;
+
+        if (newValue < 3.9 && basalActive) {
+            suspendBasal(true, "Basal insulin delivery suspended automatically (low CGM < 3.9 mmol/L)");
+            if (!autoSuspendAlertShown) {
+                QMetaObject::invokeMethod(this, [this]() {
+                    QMessageBox::warning(this, "Auto Suspend",
+                        "Glucose fell below 3.9 mmol/L.\nBasal insulin delivery has been SUSPENDED automatically.");
+                }, Qt::QueuedConnection);
+                autoSuspendAlertShown = true;
+            }
+        }
+        else if (newValue >= 4.0 && !basalActive) {
+            resumeBasal(true, "Basal insulin delivery resumed automatically (CGM stabilized >= 4.0 mmol/L)");
+            autoSuspendAlertShown = false;
+        }
+
     }
     // When off, graphTimer is stopped so no updates occur.
 }
@@ -411,5 +431,37 @@ void HomeScreen::logEvent(const QString &eventType, const QString &amount, const
 
     if (!query.exec()) {
         qDebug() << "Failed to insert event into AllEvents:" << query.lastError().text();
+    }
+}
+
+bool HomeScreen::isBasalActive() const {
+    return basalActive;
+}
+
+void HomeScreen::suspendBasal(bool logEvent1, const QString &reason) {
+    if (!basalActive) return;  // Already suspended
+    basalActive = false;
+
+
+    if (graphTimer->isActive()) {
+        graphTimer->stop();
+    }
+
+    if (logEvent1) {
+        logEvent("Insulin", "0", reason);
+    }
+}
+
+void HomeScreen::resumeBasal(bool logEvent1, const QString &reason) {
+    if (basalActive) return;  // Already active
+    basalActive = true;
+
+    // 🟢 Resume graph simulation
+    if (!graphTimer->isActive()) {
+        graphTimer->start();
+    }
+
+    if (logEvent1) {
+        logEvent("Insulin", "N/A", reason);
     }
 }

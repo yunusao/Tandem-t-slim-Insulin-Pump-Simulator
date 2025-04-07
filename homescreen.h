@@ -32,6 +32,10 @@ public:
 
     explicit HomeScreen(QWidget *parent = nullptr);
     ~HomeScreen();
+    bool isBasalActive() const;
+    void suspendBasal(bool logEvent = true, const QString &reason = "Basal insulin delivery suspended.");
+    void resumeBasal(bool logEvent = true, const QString &reason = "Basal insulin delivery resumed.");
+
 
 public slots:
     void manualInsulinInjection(double amount);
@@ -83,6 +87,8 @@ private:
     // Variables used in the graph approach.
     double baseline;
     double amplitude;
+
+    bool basalActive;
 
 
 signals:

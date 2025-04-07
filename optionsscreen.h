@@ -7,11 +7,9 @@
 #include "eventlogpage.h"
 
 class HomeScreen;
-class ProfilePage;
 
 namespace Ui {
 class OptionsScreen;
-
 }
 
 class OptionsScreen : public QWidget
@@ -21,11 +19,13 @@ class OptionsScreen : public QWidget
 public:
     explicit OptionsScreen(HomeScreen *home, QWidget *parent = nullptr);
     ~OptionsScreen();
+    void updateToggleInsulinLabel();
 
 private slots:
     void on_personalProfilesButton_clicked();
-    void on_pushButton_clicked();           // Error log button
-    void on_eventLogButton_clicked();       // AllEvents log button
+    void on_pushButton_clicked();
+    void on_eventLogButton_clicked();
+    void on_toggleInsulinButton_clicked();
 
 private:
     Ui::OptionsScreen *ui;
@@ -36,4 +36,3 @@ private:
 };
 
 #endif // OPTIONSSCREEN_H
-

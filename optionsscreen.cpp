@@ -50,3 +50,22 @@ void OptionsScreen::on_eventLogButton_clicked()
     eventLogPage->loadEvents();
     eventLogPage->show();
 }
+
+void OptionsScreen::on_toggleInsulinButton_clicked()
+{
+    if (homeScreen->isBasalActive()) {
+        homeScreen->suspendBasal(true, "Basal insulin delivery manually suspended.");
+    } else {
+        homeScreen->resumeBasal(true, "Basal insulin delivery manually resumed.");
+    }
+    updateToggleInsulinLabel();
+}
+
+void OptionsScreen::updateToggleInsulinLabel()
+{
+    if (homeScreen->isBasalActive()) {
+        ui->toggleInsulinButton->setText("Suspend Insulin");
+    } else {
+        ui->toggleInsulinButton->setText("Resume Insulin");
+    }
+}
