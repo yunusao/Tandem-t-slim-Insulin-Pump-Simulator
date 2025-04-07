@@ -424,3 +424,19 @@ void HomeScreen::resumeBasal(bool logEvent, const QString &reason) {
     // (Restore previous basal rate delivery. Here we simply re-enable any basal simulation if applicable.)
 }
 
+void HomeScreen::logEvent(const QString &eventType, const QString &amount, const QString &notes)
+{
+    QSqlQuery query;
+    QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+
+    query.prepare("INSERT INTO AllEvents (timestamp, eventType, amount, notes) "
+                  "VALUES (:timestamp, :eventType, :amount, :notes)");
+    query.bindValue(":timestamp", timestamp);
+    query.bindValue(":eventType", eventType);
+    query.bindValue(":amount", amount);
+    query.bindValue(":notes", notes);
+
+    if (!query.exec()) {
+        qDebug() << "Failed to insert event into AllEvents:" << query.lastError().text();
+    }
+}
