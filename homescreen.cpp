@@ -2,6 +2,7 @@
 #include <QInputDialog>
 #include <QtMath>
 #include <QRandomGenerator>
+#include <QSqlError>
 #include <QFile>
 #include <QTextStream>
 #include <algorithm>
@@ -39,7 +40,6 @@ void HomeScreen::logError(const QString &message)
     }
 }
 
-
 HomeScreen::HomeScreen(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::HomeScreen)
@@ -52,19 +52,16 @@ HomeScreen::HomeScreen(QWidget *parent)
     , cgmTimeTick(0)
     , poweredOn(false)      // Device starts powered off
     , batteryCounter(0)
-    , basalActive(true)     // Basal insulin delivery is active by default
 {
     ui->setupUi(this);
     ui->powerOffOverlay->show(); // Show overlay when off
-
     loadActiveUser();
-
     // Set progress bar ranges.
     ui->batteryBar->setRange(0, 100);
     ui->insulinRemainingBar->setRange(0, 300);
 
     bolusScreen = new BolusScreen(this);
-    optionsScreen = new OptionsScreen(this, this);
+    optionsScreen = new OptionsScreen(this,this);
 
     // Hide secondary screens.
     bolusScreen->hide();
@@ -76,9 +73,11 @@ HomeScreen::HomeScreen(QWidget *parent)
     connect(bolusScreen->findChild<QPushButton*>("homeButton"), &QPushButton::clicked, this, &HomeScreen::returnHome);
     connect(optionsScreen->findChild<QPushButton*>("homeButton"), &QPushButton::clicked, this, &HomeScreen::returnHome);
 
-    // Connect power buttons.
+    // Connect power on button (powerButton_2).
     connect(ui->powerButton_2, &QPushButton::pressed, this, &HomeScreen::powerPressed);
     connect(ui->powerButton_2, &QPushButton::released, this, &HomeScreen::powerReleased);
+
+    // Connect dedicated power off button (powerButton_3).
     connect(ui->powerButton_3, &QPushButton::clicked, this, &HomeScreen::powerOff);
 
     // Connect the Disconnect button.
@@ -97,7 +96,7 @@ HomeScreen::HomeScreen(QWidget *parent)
     // Initialize lastGraphY to the vertical center of the graph.
     lastGraphY = ui->graph->height() / 2;
 
-    // Initialize glucose simulation variables.
+    // Initialize our new variables.
     baseline = 5.0;
     amplitude = 1.0;
 
@@ -105,7 +104,6 @@ HomeScreen::HomeScreen(QWidget *parent)
     connect(ui->chargingButton, &QPushButton::clicked, this, &HomeScreen::toggleChargingMode);
     connect(ui->refillButton, &QPushButton::clicked, this, &HomeScreen::refillInsulin);
 }
-
 
 HomeScreen::~HomeScreen()
 {
@@ -155,6 +153,8 @@ void HomeScreen::updateTime()
                     QMessageBox::warning(this, "Low Battery", "Battery is low. Please charge the device.");
                 });
                 logError("Low Battery: Battery level at " + QString::number(batteryLevel) + "%. Please charge the device.");
+                logEvent("Battery Low", QString::number(batteryLevel), "Battery is low");
+
                 batteryLowAlertShown = true;
             }
         } else {
@@ -165,6 +165,7 @@ void HomeScreen::updateTime()
                 QMessageBox::warning(this, "Battery Depleted", "Battery depleted. Device powering off.");
             });
             logError("Battery Depleted: Battery level reached 0%. Device powering off. To continue pumping, please charge. Contact support at 613-807-9580");
+            logEvent("Battery Depleted", "0", "Device powered off due to empty battery");
             powerOff();
         }
 
@@ -175,7 +176,11 @@ void HomeScreen::updateTime()
                 QMetaObject::invokeMethod(QApplication::activeWindow(), [this]() {
                     QMessageBox::warning(QApplication::activeWindow(), "Low Insulin", "Insulin cartridge is low. Please refill your insulin cartridge.");
                 }, Qt::QueuedConnection);
+
                 logError("Low Insulin: Insulin remaining at " + QString::number(insulinRemainingUnits) + "U. Please refill the cartridge.");
+
+                logEvent("Low Insulin", QString::number(insulinRemainingUnits), "Insulin cartridge is low");
+
                 insulinLowAlertShown = true;
             }
         } else {
@@ -197,20 +202,20 @@ void HomeScreen::updateTime()
 void HomeScreen::updateGraph()
 {
     if (poweredOn) {
-        // Initialize the CGM graph if needed
         if (cgmPixmap.isNull()) {
             QSize size = ui->graph->size();
             cgmPixmap = QPixmap(size);
-            cgmPixmap.fill(QColor("#1e1e1e"));  // Dark background
+            // Fill with dark background.
+            cgmPixmap.fill(QColor("#1e1e1e"));
         }
-
-        // Scroll graph left by 1 pixel
+        // Scroll the current pixmap left by 1 pixel.
         QPixmap scrolled = cgmPixmap.copy(1, 0, cgmPixmap.width() - 1, cgmPixmap.height());
+        // Fill with dark background.
         cgmPixmap.fill(QColor("#1e1e1e"));
         QPainter painter(&cgmPixmap);
         painter.drawPixmap(0, 0, scrolled);
 
-        // Simulate glucose variation using sine wave and dynamic baseline/amplitude
+        // Deterministic up-and-down variation for both baseline and amplitude.
         static bool baselineGoingUp = true;
         static bool amplitudeGoingUp = true;
         double baselineStep = 0.005;
@@ -234,17 +239,12 @@ void HomeScreen::updateGraph()
         double fastSine = std::sin(t);
         double newValue = baseline + fastSine * amplitude;
 
-        bool belowThreshold = false;
-        if (newValue < 3.9) {
-            belowThreshold = true;
-            newValue = 3.9;  // Clamp minimum for display
-        }
+        if (newValue < 3.9) newValue = 3.9;
         if (newValue > 10.0) newValue = 10.0;
 
-        // Update glucose value display
+        // Update the current blood glucose label.
         ui->currentBldGlu->setText(QString::number(newValue, 'f', 1));
 
-        // Calculate new graph y-position
         int graphHeight = cgmPixmap.height();
         int yPos = graphHeight - static_cast<int>(((newValue - 3.9) / (10.0 - 3.9)) * graphHeight);
 
@@ -253,33 +253,16 @@ void HomeScreen::updateGraph()
         if (yPos < 0) yPos = 0;
         if (yPos >= graphHeight) yPos = graphHeight - 1;
 
-        // Draw line from last point to new point
         painter.setPen(Qt::white);
         painter.drawLine(cgmPixmap.width() - 2, lastGraphY, cgmPixmap.width() - 1, yPos);
         painter.end();
-
         ui->graph->setPixmap(cgmPixmap);
+
         lastGraphY = yPos;
         cgmTimeTick++;
-
-        // ---- Auto-Suspend Basal Logic ----
-        static bool autoSuspendAlertShown = false;
-        if (belowThreshold && basalActive) {
-            suspendBasal(true, "Basal insulin delivery suspended automatically (low CGM < 3.9)");
-            if (!autoSuspendAlertShown) {
-                QMetaObject::invokeMethod(this, [this]() {
-                    QMessageBox::warning(this, "Auto Suspend",
-                        "Glucose fell below 3.9 mmol/L.\nBasal insulin delivery has been SUSPENDED automatically.");
-                }, Qt::QueuedConnection);
-                autoSuspendAlertShown = true;
-            }
-        } else if (!belowThreshold) {
-            autoSuspendAlertShown = false;
-        }
     }
     // When off, graphTimer is stopped so no updates occur.
 }
-
 
 void HomeScreen::powerPressed()
 {
@@ -318,12 +301,13 @@ void HomeScreen::showBolusScreen()
     this->hide();
     bolusScreen->setWindowFlags(Qt::Window);
     bolusScreen->show();
+    logEvent("Power", "", "Device powered off manually");
+
 }
 
 void HomeScreen::showOptionsScreen()
 {
     this->hide();
-    optionsScreen->updateBasalButtonLabel();  // Set correct text based on current basalActive state
     optionsScreen->setWindowFlags(Qt::Window);
     optionsScreen->show();
 }
@@ -349,6 +333,8 @@ void HomeScreen::refillInsulin()
     insulinRemainingUnits = 300;
     ui->insulinRemainingBar->setValue(insulinRemainingUnits);
     ui->insulinRemaining->setText("300U");
+    logEvent("Refill", "300", "Insulin cartridge refilled");
+
 }
 
 void HomeScreen::manualInsulinInjection(double amount)
@@ -363,10 +349,9 @@ void HomeScreen::manualInsulinInjection(double amount)
     // Increase the insulin on board.
     insulinOnBoard += amount;
     ui->label_2->setText(QString::number(insulinOnBoard, 'f', 1) + " u");
+    logEvent("Bolus", QString::number(amount, 'f', 1), "Manual insulin injection delivered");
+    logEvent("Bolus", QString::number(amount, 'f', 1), "Manual bolus delivered");
 
-    // Log the bolus event
-    QString msg = QString("Bolus: Manual insulin injection of %1U delivered").arg(amount, 0, 'f', 1);
-    logError(msg);
 }
 
 // New slot for Disconnect button.
@@ -375,7 +360,7 @@ void HomeScreen::disconnectCGM()
     QMessageBox::warning(this, "CGM Disconnection",
         "CGM disconnection trigger detected. Insulin delivery suspended. Please check your CGM connection and press 'OK' once connected.");
     logError("CGM Disconnection: Insulin delivery suspended. Check CGM connection.");
-    suspendBasal(false);  // suspend basal (do not log again because we already logged above)
+    logEvent("CGM Disconnected", "0", "CGM disconnection trigger detected");
 
 }
 
@@ -399,31 +384,6 @@ void HomeScreen::loadActiveUser() {
     ui->activeUserTable->resizeColumnToContents(4);
 }
 
-bool HomeScreen::isBasalActive() const {
-    return basalActive;
-}
-
-void HomeScreen::suspendBasal(bool logEvent, const QString &reason) {
-    if (!basalActive)
-        return;
-    basalActive = false;
-    if (logEvent) {
-        logError(reason);
-    }
-    // (In a real pump, we would also stop basal insulin delivery here.
-    // In this simulation, basalActive=false will signal other logic to halt any automatic basal infusion.)
-}
-
-void HomeScreen::resumeBasal(bool logEvent, const QString &reason) {
-    if (basalActive)
-        return;
-    basalActive = true;
-    if (logEvent) {
-        logError(reason);
-    }
-    // (Restore previous basal rate delivery. Here we simply re-enable any basal simulation if applicable.)
-}
-
 void HomeScreen::logEvent(const QString &eventType, const QString &amount, const QString &notes)
 {
     QSqlQuery query;
@@ -431,6 +391,7 @@ void HomeScreen::logEvent(const QString &eventType, const QString &amount, const
 
     query.prepare("INSERT INTO AllEvents (timestamp, eventType, amount, notes) "
                   "VALUES (:timestamp, :eventType, :amount, :notes)");
+
     query.bindValue(":timestamp", timestamp);
     query.bindValue(":eventType", eventType);
     query.bindValue(":amount", amount);

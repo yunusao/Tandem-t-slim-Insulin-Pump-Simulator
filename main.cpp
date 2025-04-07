@@ -37,7 +37,10 @@ int main(int argc, char *argv[])
         qDebug() << "failed 3s";
     }
 
+
+
     QSqlQuery query3;
+    query.exec("DROP TABLE IF EXISTS AllEvents");
     QString createAllEventsTable = R"(
         CREATE TABLE IF NOT EXISTS AllEvents (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -50,6 +53,9 @@ int main(int argc, char *argv[])
     if (!query3.exec(createAllEventsTable)) {
         qDebug() << "Failed to create AllEvents table:" << query3.lastError().text();
     }
+
+    qDebug() << "Database path:" << db.databaseName();
+
 
     QSqlQuery q(("SELECT id FROM profiles WHERE active = 1 LIMIT 1"));
     if (q.exec() && q.next()) {

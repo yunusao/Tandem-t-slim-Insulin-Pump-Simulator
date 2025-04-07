@@ -4,6 +4,8 @@
 #include <QWidget>
 #include "profilepage.h"
 #include "errorlogpage.h"
+#include "eventlogpage.h"
+
 class HomeScreen;
 
 namespace Ui {
@@ -17,24 +19,18 @@ class OptionsScreen : public QWidget
 public:
     explicit OptionsScreen(HomeScreen *home, QWidget *parent = nullptr);
     ~OptionsScreen();
-    void updateBasalButtonLabel();  // New helper to set suspend/resume button text
-
 
 private slots:
     void on_personalProfilesButton_clicked();
-
-    void on_pushButton_clicked();
-    void on_suspendResumeButton_clicked();   // New slot for basal toggle button
-    void on_eventLogButton_clicked();
-
+    void on_pushButton_clicked();           // Error log button
+    void on_eventLogButton_clicked();       // AllEvents log button
 
 private:
     Ui::OptionsScreen *ui;
     ProfilePage *profilePage;
     errorlogpage *errorLogs;
+    EventLogPage *eventLogPage;
     HomeScreen *homeScreen;
-
-
 };
 
 #endif // OPTIONSSCREEN_H
