@@ -143,6 +143,15 @@ void HomeScreen::updateTime()
             // Decay insulin on board at 1/4th of previous rate.
             insulinOnBoard = std::max(0.0, insulinOnBoard - 0.125);
             ui->label_2->setText(QString::number(insulinOnBoard, 'f', 1) + " u");
+
+            static bool durationLogged = false;
+            if (insulinOnBoard <= 0.0 && !durationLogged) {
+                logEvent("Duration", "", "Insulin on board has cleared (duration complete)");
+                durationLogged = true;
+            }
+            if (insulinOnBoard > 0.0) {
+                durationLogged = false;  
+            }
         }
 
         // --- Error Handling for Battery ---
@@ -349,9 +358,12 @@ void HomeScreen::manualInsulinInjection(double amount)
     // Increase the insulin on board.
     insulinOnBoard += amount;
     ui->label_2->setText(QString::number(insulinOnBoard, 'f', 1) + " u");
-    logEvent("Bolus", QString::number(amount, 'f', 1), "Manual insulin injection delivered");
-    logEvent("Bolus", QString::number(amount, 'f', 1), "Manual bolus delivered");
 
+    // logging event
+    QString msg = QString("Bolus: Manual insulin injection of %1U delivered").arg(amount, 0, 'f', 1);
+    logError(msg);;
+    QString durationMsg = QString("Insulin duration: %1 hours estimated for %2U bolus").arg("4").arg(amount, 0, 'f', 1);
+    logEvent("Duration", QString::number(amount, 'f', 1), durationMsg);
 }
 
 // New slot for Disconnect button.
