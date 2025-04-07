@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 
 
     QSqlQuery query3;
-    query.exec("DROP TABLE IF EXISTS AllEvents");
+    
     QString createAllEventsTable = R"(
         CREATE TABLE IF NOT EXISTS AllEvents (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
