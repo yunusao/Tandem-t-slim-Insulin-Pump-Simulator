@@ -83,7 +83,6 @@ void CreateEditProfile::on_submiButton_clicked()
  */
 void CreateEditProfile::on_submiButton_clicked()
 {
-    // Validate
     if (ui->nameEdit->text().isEmpty() || ui->basalEdit->text().isEmpty() ||
         ui->carbEdit->text().isEmpty() || ui->corrEdit->text().isEmpty() ||
         ui->targetEdit->text().isEmpty()) {
@@ -91,53 +90,76 @@ void CreateEditProfile::on_submiButton_clicked()
         return;
     }
 
-    // Prepare query
+    QString name = ui->nameEdit->text();
+    double newBasal = ui->basalEdit->text().toDouble();
+    double newCorr = ui->corrEdit->text().toDouble();
+    double newCarb = ui->carbEdit->text().toDouble();
+    double newTarget = ui->targetEdit->text().toDouble();
+
     QSqlQuery q;
+
     if (id == -1) {
+        // Insert new profile
         q.prepare("INSERT INTO profiles (name, basalRate, carbRatio, correctionFactor, glucoseTarget) "
                   "VALUES (:n, :b, :c, :cf, :gt)");
     } else {
-        // Retrieve current values before updating
-       QSqlQuery fetch;
-       fetch.prepare("SELECT * FROM profiles WHERE id = :id");
-       fetch.bindValue(":id", id);
-       if (fetch.exec() && fetch.next()) {
-           double oldBasal = fetch.value("basalRate").toDouble();
-           double oldCorr = fetch.value("correctionFactor").toDouble();
+        // Fetch previous values for logging changes
+        QSqlQuery fetch;
+        fetch.prepare("SELECT * FROM profiles WHERE id = :id");
+        fetch.bindValue(":id", id);
 
-           double newBasal = ui->basalEdit->text().toDouble();
-           double newCorr = ui->corrEdit->text().toDouble();
+        if (fetch.exec() && fetch.next()) {
+            QString prevName = fetch.value("name").toString();
+            double oldBasal = fetch.value("basalRate").toDouble();
+            double oldCorr = fetch.value("correctionFactor").toDouble();
+            double oldCarb = fetch.value("carbRatio").toDouble();
+            double oldTarget = fetch.value("glucoseTarget").toDouble();
 
-           if (!qFuzzyCompare(oldBasal + 1.0, newBasal + 1.0)) {
-               homeScreen->logEvent("Profile", "", QString("Basal rate changed from %1 to %2").arg(oldBasal).arg(newBasal));
-           }
-           if (!qFuzzyCompare(oldCorr + 1.0, newCorr + 1.0)) {
-               homeScreen->logEvent("Profile", "", QString("Correction factor updated from %1 to %2").arg(oldCorr).arg(newCorr));
-           }
-       }
+            QString profileLabel = "[" + prevName + "]";
+
+            if (!qFuzzyCompare(oldBasal + 1.0, newBasal + 1.0)) {
+                homeScreen->logEvent("Profile", "", QString("%1 Basal rate changed from %2 to %3")
+                                     .arg(profileLabel).arg(oldBasal).arg(newBasal));
+            }
+            if (!qFuzzyCompare(oldCorr + 1.0, newCorr + 1.0)) {
+                homeScreen->logEvent("Profile", "", QString("%1 Correction factor updated from %2 to %3")
+                                     .arg(profileLabel).arg(oldCorr).arg(newCorr));
+            }
+            if (!qFuzzyCompare(oldCarb + 1.0, newCarb + 1.0)) {
+                homeScreen->logEvent("Profile", "", QString("%1 Carb ratio changed from %2 to %3")
+                                     .arg(profileLabel).arg(oldCarb).arg(newCarb));
+            }
+            if (!qFuzzyCompare(oldTarget + 1.0, newTarget + 1.0)) {
+                homeScreen->logEvent("Profile", "", QString("%1 Glucose target changed from %2 to %3")
+                                     .arg(profileLabel).arg(oldTarget).arg(newTarget));
+            }
+        }
+
+        // Prepare update query
         q.prepare("UPDATE profiles SET name=:n, basalRate=:b, carbRatio=:c, correctionFactor=:cf, glucoseTarget=:gt "
                   "WHERE id=:id");
         q.bindValue(":id", id);
     }
 
-    // Bind values
-    q.bindValue(":n", ui->nameEdit->text());
-    q.bindValue(":b", ui->basalEdit->text().toDouble());
-    q.bindValue(":c", ui->carbEdit->text().toDouble());
-    q.bindValue(":cf", ui->corrEdit->text().toDouble());
-    q.bindValue(":gt", ui->targetEdit->text().toDouble());
+    // Bind values for insert or update
+    q.bindValue(":n", name);
+    q.bindValue(":b", newBasal);
+    q.bindValue(":c", newCarb);
+    q.bindValue(":cf", newCorr);
+    q.bindValue(":gt", newTarget);
 
-    // Execute
     if (q.exec()) {
-        emit profileSaved();  // ✅ let the parent know to reload
+        emit profileSaved();
         if (parentWidget()) {
-              parentWidget()->show();  // ✅ Bring back ProfilePage
+            parentWidget()->show();
         }
-        this->close();  // ✅ Done, close safely
+        this->close();
     } else {
         QMessageBox::critical(this, "Database Error", "Failed to save profile.");
     }
 }
+
+
 
 void CreateEditProfile::on_cancelButton_clicked()
 {

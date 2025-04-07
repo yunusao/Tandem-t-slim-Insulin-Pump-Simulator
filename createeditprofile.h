@@ -33,7 +33,7 @@ private:
 
 
 signals:
-    void profileSaved();  // ✅ will notify parent to reload
+    void profileSaved();  
 };
 
 #endif // CREATEEDITPROFILE_H

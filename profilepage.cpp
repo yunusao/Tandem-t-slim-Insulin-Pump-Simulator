@@ -112,4 +112,3 @@ void ProfilePage::on_backButton_clicked()
     }
 
 }
-

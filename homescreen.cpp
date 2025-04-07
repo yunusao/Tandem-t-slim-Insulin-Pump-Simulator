@@ -8,7 +8,7 @@
 #include <algorithm>
 #include "homescreen.h"
 #include "ui_homescreen.h"
-#include "mainwindow.h"  
+#include "mainwindow.h"
 
 /**
  * @brief HomeScreen::logError
