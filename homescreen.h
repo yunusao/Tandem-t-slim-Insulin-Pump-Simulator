@@ -15,6 +15,10 @@
 #include "optionsscreen.h"
 #include "profileservice.h"
 
+
+class OptionsScreen;
+class BolusScreen;
+
 namespace Ui {
 class HomeScreen;
 }
@@ -24,6 +28,8 @@ class HomeScreen : public QWidget
     Q_OBJECT
 
 public:
+    void logEvent(const QString &eventType, const QString &amount, const QString &notes);
+
     explicit HomeScreen(QWidget *parent = nullptr);
     ~HomeScreen();
 
@@ -77,7 +83,6 @@ private:
     // Variables used in the graph approach.
     double baseline;
     double amplitude;
-    void logEvent(const QString &eventType, const QString &amount, const QString &notes);
 
 
 signals:

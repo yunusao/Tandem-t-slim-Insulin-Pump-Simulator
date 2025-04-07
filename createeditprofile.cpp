@@ -1,5 +1,7 @@
 #include "createeditprofile.h"
 #include "ui_createeditprofile.h"
+#include "mainwindow.h"
+#include "homescreen.h"
 /**
  * @brief CreateEditProfile::CreateEditProfile
  * @param parent
@@ -10,9 +12,9 @@
  * key (check main.cpp for db setup and implementation)
  */
 
-CreateEditProfile::CreateEditProfile(QWidget *parent, int editProfileId) :
+CreateEditProfile::CreateEditProfile(QWidget *parent, int editProfileId, HomeScreen *home) :
     QWidget(parent),
-    ui(new Ui::CreateEditProfile), id(editProfileId)
+    ui(new Ui::CreateEditProfile), id(editProfileId), homeScreen(home)
 {
     ui->setupUi(this);
     qDebug() <<"Create"<< QSqlDatabase::database().databaseName();
@@ -95,6 +97,24 @@ void CreateEditProfile::on_submiButton_clicked()
         q.prepare("INSERT INTO profiles (name, basalRate, carbRatio, correctionFactor, glucoseTarget) "
                   "VALUES (:n, :b, :c, :cf, :gt)");
     } else {
+        // Retrieve current values before updating
+       QSqlQuery fetch;
+       fetch.prepare("SELECT * FROM profiles WHERE id = :id");
+       fetch.bindValue(":id", id);
+       if (fetch.exec() && fetch.next()) {
+           double oldBasal = fetch.value("basalRate").toDouble();
+           double oldCorr = fetch.value("correctionFactor").toDouble();
+
+           double newBasal = ui->basalEdit->text().toDouble();
+           double newCorr = ui->corrEdit->text().toDouble();
+
+           if (!qFuzzyCompare(oldBasal + 1.0, newBasal + 1.0)) {
+               homeScreen->logEvent("Profile", "", QString("Basal rate changed from %1 to %2").arg(oldBasal).arg(newBasal));
+           }
+           if (!qFuzzyCompare(oldCorr + 1.0, newCorr + 1.0)) {
+               homeScreen->logEvent("Profile", "", QString("Correction factor updated from %1 to %2").arg(oldCorr).arg(newCorr));
+           }
+       }
         q.prepare("UPDATE profiles SET name=:n, basalRate=:b, carbRatio=:c, correctionFactor=:cf, glucoseTarget=:gt "
                   "WHERE id=:id");
         q.bindValue(":id", id);

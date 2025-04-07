@@ -7,9 +7,11 @@
 #include "eventlogpage.h"
 
 class HomeScreen;
+class ProfilePage;
 
 namespace Ui {
 class OptionsScreen;
+
 }
 
 class OptionsScreen : public QWidget
@@ -34,3 +36,4 @@ private:
 };
 
 #endif // OPTIONSSCREEN_H
+
