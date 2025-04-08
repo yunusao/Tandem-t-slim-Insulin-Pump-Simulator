@@ -23,6 +23,7 @@
 ❖ Yunus Abu-Oshaibah
     ➢ Insulin Pump UI (all UI components)
     ➢ Debugging
+    ➢ Button Logic for UI
     
 ❖ Jonah Pelkey
     ➢ Insulin Pump Central hub logic
