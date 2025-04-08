@@ -33,16 +33,44 @@
     ➢ Insulin Pump Information and History Logic (Data storage)
 
 ## FILES
-- Sequence diagrams:
-    -bolus_delivery.pdf
-    -normal.pdf
-    -errors.pdf
-    -profile_management.pdf
+❖ Sequence diagrams:
+    ➢ bolus_delivery.pdf
+    ➢ normal.pdf
+    ➢ errors.pdf
+    ➢ profile_management.pdf
 
-- State diagrams:
-    -bolus/insulin_delivery.pdf
-    -pump.pdf
+❖ State diagrams:
+    ➢ bolus/insulin_delivery.pdf
+    ➢ pump.pdf
 
-- Project_plan.pdf
+❖ Project_plan.pdf
+
+## INTERACTABLE ELEMENTS
+❖ Pump Home Page
+    ➢ Tandem Logo 
+    ➢ Recharge Battery Button
+    ➢ Refill Button
+    ➢ Options Button
+    ➢ Bolus Button
+    
+❖ Bolus delivery
+    ➢ Add Carbs/bg Button
+    ➢ Numerical input keys
+    ➢ Checkmark/Proceed Button
+    ➢ Back Button
+    ➢ Tandem logo
+    ➢ Extended Bolus checkbox
+    ➢ Bolus Now/Later Button
+    
+❖ Profile Management
+    ➢ Profile elements(target bg, correction factor etc..)
+    ➢ Update Button
+    ➢ Delete BUtton 
+    ➢ Tandem logo 
+    
+❖ Error Logs
+❖ Pump History
+    
+
 
     
