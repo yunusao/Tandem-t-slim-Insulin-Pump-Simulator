@@ -466,5 +466,28 @@ void HomeScreen::resumeBasal(bool logEvent1, const QString &reason) {
     }
 }
 
+void HomeScreen::deliverBolus(double units, int durationMs)
+{
+   if (durationMs <= 0) {
+       if (units > insulinRemainingUnits)
+           units = insulinRemainingUnits;
+       insulinRemainingUnits -= units;
+       insulinOnBoard += units;
+       ui->insulinRemainingBar->setValue(insulinRemainingUnits);
+       ui->insulinRemaining->setText(QString::number(insulinRemainingUnits) + "U");
+       ui->label_2->setText(QString::number(insulinOnBoard, 'f', 1) + " u");
+       logError(QString("Immediate bolus: %1 U delivered.").arg(units, 0, 'f', 1));
+   } else {
+       BolusDelivery bolus;
+       bolus.totalUnits = units;
+       bolus.remainingUnits = units;
+       bolus.durationMs = durationMs;
+       bolus.startTime = QDateTime::currentDateTime();
+       bolus.rate = units / static_cast<double>(durationMs); // units per ms
+       activeBoluses.append(bolus);
+       logError(QString("Extended bolus: %1 U over %2 ms scheduled.").arg(units, 0, 'f', 1).arg(durationMs));
+   }
+}
+
 
 
