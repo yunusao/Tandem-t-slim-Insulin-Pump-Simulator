@@ -7,11 +7,13 @@
 #include <QSqlQuery>
 #include <QDebug>
 #include "profileservice.h"
+#include "homescreen.h"
 
 
-
+class HomeScreen;
 namespace Ui {
 class ProfilePage;
+
 }
 
 class ProfilePage : public QWidget
@@ -19,8 +21,9 @@ class ProfilePage : public QWidget
     Q_OBJECT
 
 public:
-    explicit ProfilePage(QWidget *parent = nullptr);
+    explicit ProfilePage(HomeScreen *home = nullptr, QWidget *parent = nullptr);
     ~ProfilePage();
+    void loadProfiles();
 
 signals:
     void newActiveProfile();
@@ -33,7 +36,7 @@ private slots:
 
 private:
     Ui::ProfilePage *ui;
-    void loadProfiles();
+    HomeScreen *homescreen;
 };
 
 #endif // PROFILEPAGE_H

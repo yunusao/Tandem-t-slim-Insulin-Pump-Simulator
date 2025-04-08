@@ -36,6 +36,27 @@ int main(int argc, char *argv[])
     if (!query2.exec(createTable2)){
         qDebug() << "failed 3s";
     }
+
+
+
+    QSqlQuery query3;
+
+    QString createAllEventsTable = R"(
+        CREATE TABLE IF NOT EXISTS AllEvents (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            timestamp TEXT,
+            eventType TEXT,
+            amount TEXT,
+            notes TEXT
+        )
+    )";
+    if (!query3.exec(createAllEventsTable)) {
+        qDebug() << "Failed to create AllEvents table:" << query3.lastError().text();
+    }
+
+    qDebug() << "Database path:" << db.databaseName();
+
+
     QSqlQuery q(("SELECT id FROM profiles WHERE active = 1 LIMIT 1"));
     if (q.exec() && q.next()) {
         int id = q.value(0).toInt();

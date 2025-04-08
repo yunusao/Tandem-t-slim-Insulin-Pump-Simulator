@@ -1,10 +1,12 @@
 #include "profilepage.h"
 #include "ui_profilepage.h"
 #include "createeditprofile.h"
+#include "homescreen.h"
 
-ProfilePage::ProfilePage(QWidget *parent) :
+ProfilePage::ProfilePage(HomeScreen *home, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::ProfilePage)
+    ui(new Ui::ProfilePage),
+    homescreen(home)
 {
     qDebug() <<"Profile"<< QSqlDatabase::database().databaseName();
     ui->setupUi(this);
@@ -45,7 +47,7 @@ void ProfilePage::loadProfiles() {
       connect(editButton, &QPushButton::clicked, [=]() {
           qDebug() << id;
 
-          CreateEditProfile *editProfile = new CreateEditProfile(this, id);
+          CreateEditProfile *editProfile = new CreateEditProfile(this, id, homescreen);
           editProfile->setWindowFlags(Qt::Window);
                   connect(editProfile, &CreateEditProfile::profileSaved, this, [=]() {
                   loadProfiles();
@@ -92,7 +94,8 @@ void ProfilePage::loadProfiles() {
 void ProfilePage::on_createProfileButton_clicked()
 {
     //CreateEditProfile *createProfile = new CreateEditProfile(nullptr, -1);
-    CreateEditProfile *createProfile = new CreateEditProfile(this, -1);
+    CreateEditProfile *createProfile = new CreateEditProfile(this, -1, homescreen);
+
     createProfile->setWindowFlags(Qt::Window);  // ✅ Make it a standalone screen
     this->hide();
     createProfile->show();

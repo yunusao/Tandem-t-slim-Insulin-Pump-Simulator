@@ -2,12 +2,13 @@
 #include <QInputDialog>
 #include <QtMath>
 #include <QRandomGenerator>
+#include <QSqlError>
 #include <QFile>
 #include <QTextStream>
 #include <algorithm>
 #include "homescreen.h"
 #include "ui_homescreen.h"
-#include "mainwindow.h"  // For returning to MainWindow when needed
+#include "mainwindow.h"
 
 /**
  * @brief HomeScreen::logError
@@ -51,6 +52,7 @@ HomeScreen::HomeScreen(QWidget *parent)
     , cgmTimeTick(0)
     , poweredOn(false)      // Device starts powered off
     , batteryCounter(0)
+    , basalActive(true)
 {
     ui->setupUi(this);
     ui->powerOffOverlay->show(); // Show overlay when off
@@ -142,6 +144,15 @@ void HomeScreen::updateTime()
             // Decay insulin on board at 1/4th of previous rate.
             insulinOnBoard = std::max(0.0, insulinOnBoard - 0.125);
             ui->label_2->setText(QString::number(insulinOnBoard, 'f', 1) + " u");
+
+            static bool durationLogged = false;
+            if (insulinOnBoard <= 0.0 && !durationLogged) {
+                logEvent("Duration", "", "Insulin on board has cleared (duration complete)");
+                durationLogged = true;
+            }
+            if (insulinOnBoard > 0.0) {
+                durationLogged = false;
+            }
         }
 
         // --- Error Handling for Battery ---
@@ -152,6 +163,8 @@ void HomeScreen::updateTime()
                     QMessageBox::warning(this, "Low Battery", "Battery is low. Please charge the device.");
                 });
                 logError("Low Battery: Battery level at " + QString::number(batteryLevel) + "%. Please charge the device.");
+                logEvent("Battery Low", QString::number(batteryLevel), "Battery is low");
+
                 batteryLowAlertShown = true;
             }
         } else {
@@ -162,6 +175,7 @@ void HomeScreen::updateTime()
                 QMessageBox::warning(this, "Battery Depleted", "Battery depleted. Device powering off.");
             });
             logError("Battery Depleted: Battery level reached 0%. Device powering off. To continue pumping, please charge. Contact support at 613-807-9580");
+            logEvent("Battery Depleted", "0", "Device powered off due to empty battery");
             powerOff();
         }
 
@@ -172,7 +186,11 @@ void HomeScreen::updateTime()
                 QMetaObject::invokeMethod(QApplication::activeWindow(), [this]() {
                     QMessageBox::warning(QApplication::activeWindow(), "Low Insulin", "Insulin cartridge is low. Please refill your insulin cartridge.");
                 }, Qt::QueuedConnection);
+
                 logError("Low Insulin: Insulin remaining at " + QString::number(insulinRemainingUnits) + "U. Please refill the cartridge.");
+
+                logEvent("Low Insulin", QString::number(insulinRemainingUnits), "Insulin cartridge is low");
+
                 insulinLowAlertShown = true;
             }
         } else {
@@ -252,6 +270,25 @@ void HomeScreen::updateGraph()
 
         lastGraphY = yPos;
         cgmTimeTick++;
+
+
+        static bool autoSuspendAlertShown = false;
+
+        if (newValue < 3.9 && basalActive) {
+            suspendBasal(true, "Basal insulin delivery suspended automatically (low CGM < 3.9 mmol/L)");
+            if (!autoSuspendAlertShown) {
+                QMetaObject::invokeMethod(this, [this]() {
+                    QMessageBox::warning(this, "Auto Suspend",
+                        "Glucose fell below 3.9 mmol/L.\nBasal insulin delivery has been SUSPENDED automatically.");
+                }, Qt::QueuedConnection);
+                autoSuspendAlertShown = true;
+            }
+        }
+        else if (newValue >= 4.0 && !basalActive) {
+            resumeBasal(true, "Basal insulin delivery resumed automatically (CGM stabilized >= 4.0 mmol/L)");
+            autoSuspendAlertShown = false;
+        }
+
     }
     // When off, graphTimer is stopped so no updates occur.
 }
@@ -293,6 +330,8 @@ void HomeScreen::showBolusScreen()
     this->hide();
     bolusScreen->setWindowFlags(Qt::Window);
     bolusScreen->show();
+    logEvent("Power", "", "Device powered off manually");
+
 }
 
 void HomeScreen::showOptionsScreen()
@@ -323,6 +362,8 @@ void HomeScreen::refillInsulin()
     insulinRemainingUnits = 300;
     ui->insulinRemainingBar->setValue(insulinRemainingUnits);
     ui->insulinRemaining->setText("300U");
+    logEvent("Refill", "300", "Insulin cartridge refilled");
+
 }
 
 void HomeScreen::manualInsulinInjection(double amount)
@@ -337,6 +378,12 @@ void HomeScreen::manualInsulinInjection(double amount)
     // Increase the insulin on board.
     insulinOnBoard += amount;
     ui->label_2->setText(QString::number(insulinOnBoard, 'f', 1) + " u");
+
+    // logging event
+    QString msg = QString("Bolus: Manual insulin injection of %1U delivered").arg(amount, 0, 'f', 1);
+    logError(msg);;
+    QString durationMsg = QString("Insulin duration: %1 hours estimated for %2U bolus").arg("4").arg(amount, 0, 'f', 1);
+    logEvent("Duration", QString::number(amount, 'f', 1), durationMsg);
 }
 
 // New slot for Disconnect button.
@@ -345,6 +392,8 @@ void HomeScreen::disconnectCGM()
     QMessageBox::warning(this, "CGM Disconnection",
         "CGM disconnection trigger detected. Insulin delivery suspended. Please check your CGM connection and press 'OK' once connected.");
     logError("CGM Disconnection: Insulin delivery suspended. Check CGM connection.");
+    logEvent("CGM Disconnected", "0", "CGM disconnection trigger detected");
+
 }
 
 void HomeScreen::loadActiveUser() {
@@ -366,5 +415,56 @@ void HomeScreen::loadActiveUser() {
     ui->activeUserTable->resizeColumnToContents(3);
     ui->activeUserTable->resizeColumnToContents(4);
 }
+
+void HomeScreen::logEvent(const QString &eventType, const QString &amount, const QString &notes)
+{
+    QSqlQuery query;
+    QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+
+    query.prepare("INSERT INTO AllEvents (timestamp, eventType, amount, notes) "
+                  "VALUES (:timestamp, :eventType, :amount, :notes)");
+
+    query.bindValue(":timestamp", timestamp);
+    query.bindValue(":eventType", eventType);
+    query.bindValue(":amount", amount);
+    query.bindValue(":notes", notes);
+
+    if (!query.exec()) {
+        qDebug() << "Failed to insert event into AllEvents:" << query.lastError().text();
+    }
+}
+
+bool HomeScreen::isBasalActive() const {
+    return basalActive;
+}
+
+void HomeScreen::suspendBasal(bool logEvent1, const QString &reason) {
+    if (!basalActive) return;  // Already suspended
+    basalActive = false;
+
+
+    if (graphTimer->isActive()) {
+        graphTimer->stop();
+    }
+
+    if (logEvent1) {
+        logEvent("Insulin", "0", reason);
+    }
+}
+
+void HomeScreen::resumeBasal(bool logEvent1, const QString &reason) {
+    if (basalActive) return;  // Already active
+    basalActive = true;
+
+    // 🟢 Resume graph simulation
+    if (!graphTimer->isActive()) {
+        graphTimer->start();
+    }
+
+    if (logEvent1) {
+        logEvent("Insulin", "N/A", reason);
+    }
+}
+
 
 

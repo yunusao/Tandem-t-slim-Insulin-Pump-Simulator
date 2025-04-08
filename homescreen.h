@@ -15,6 +15,10 @@
 #include "optionsscreen.h"
 #include "profileservice.h"
 
+
+class OptionsScreen;
+class BolusScreen;
+
 namespace Ui {
 class HomeScreen;
 }
@@ -24,8 +28,14 @@ class HomeScreen : public QWidget
     Q_OBJECT
 
 public:
+    void logEvent(const QString &eventType, const QString &amount, const QString &notes);
+
     explicit HomeScreen(QWidget *parent = nullptr);
     ~HomeScreen();
+    bool isBasalActive() const;
+    void suspendBasal(bool logEvent = true, const QString &reason = "Basal insulin delivery suspended.");
+    void resumeBasal(bool logEvent = true, const QString &reason = "Basal insulin delivery resumed.");
+
 
 public slots:
     void manualInsulinInjection(double amount);
@@ -77,6 +87,9 @@ private:
     // Variables used in the graph approach.
     double baseline;
     double amplitude;
+
+    bool basalActive;
+
 
 signals:
     void errorSaved();

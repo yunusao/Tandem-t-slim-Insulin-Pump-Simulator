@@ -1,6 +1,7 @@
 #ifndef CREATEEDITPROFILE_H
 #define CREATEEDITPROFILE_H
 
+#include "homescreen.h"
 #include <QWidget>
 #include <QSqlQuery>
 #include <QMessageBox>
@@ -16,7 +17,7 @@ class CreateEditProfile : public QWidget
     Q_OBJECT
 
 public:
-    explicit CreateEditProfile(QWidget *parent = nullptr, int id = -1);
+    explicit CreateEditProfile(QWidget *parent = nullptr, int editProfileId = -1, HomeScreen *home = nullptr);
     ~CreateEditProfile();
 
 private slots:
@@ -28,6 +29,8 @@ private slots:
 private:
     Ui::CreateEditProfile *ui;
     int id;
+    HomeScreen *homeScreen = nullptr;
+
 
 signals:
     void profileSaved();  // ✅ will notify parent to reload
