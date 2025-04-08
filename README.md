@@ -12,7 +12,7 @@
 ## CONTRIBUTIONS
 ❖ Adam Saleh:
     ➢ Use case
-    ➢ Requirement Tracebility Matrix
+    ➢ Requirement Traceability Matrix
     ➢ Database- Error log & Profile Page Setup
     
 ❖ Ahmid Kamara:
@@ -45,6 +45,21 @@
 
 ❖ Project_plan.pdf
 
+## FEATURES
+❖ A PIN-based lock screen or Power button hold limit to prevent accidental inputs.
+
+❖ View Insulin pump information via a central hub (battery percentage, pump gauge, IOB, CGM data, etc.).
+
+❖ Recharge the pump Battery, refill the pump gauge & stop the simulation.
+
+❖ Manual basal insulin delivery to control treatment (start/stop/resume insulin delivery).
+
+❖ Calculate correction Bolus delivery, option to extend bolus delivery also available.
+
+❖ Manage different user profiles/routines.
+
+❖ View Pump activity history and error logs to track treatment progress.
+
 ## INTERACTABLE ELEMENTS
 ❖ Pump Home Page
     ➢ Tandem Logo 
@@ -52,25 +67,30 @@
     ➢ Refill Button
     ➢ Options Button
     ➢ Bolus Button
+    ➢ Start/ Stop Insulin delivery
+    ➢ Start/ Stop simulation
     
 ❖ Bolus delivery
     ➢ Add Carbs/bg Button
-    ➢ Numerical input keys
+    ➢ Numerical input
     ➢ Checkmark/Proceed Button
     ➢ Back Button
     ➢ Tandem logo
     ➢ Extended Bolus checkbox
-    ➢ Bolus Now/Later Button
+    ➢ Bolus Now/Later Numerical input
     
 ❖ Profile Management
-    ➢ Profile elements(target bg, correction factor etc..)
+    ➢ Profile elements(Name, target bg, correction factor etc..)
     ➢ Update Button
     ➢ Delete BUtton 
     ➢ Tandem logo 
     
 ❖ Error Logs
+
 ❖ Pump History
-    
+
+## VISUALS PRESENTATION
+❖ Include a link to the video(Yunus)    
 
 
     
