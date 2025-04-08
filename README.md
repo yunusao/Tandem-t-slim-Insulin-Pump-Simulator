@@ -43,7 +43,11 @@
     ➢ bolus/insulin_delivery.pdf
     ➢ pump.pdf
 
-❖ Project_plan.pdf
+❖ Design Documentation:
+    ➢ Project_plan.pdf
+    ➢ Use case/ Use case diagram
+    ➢ UML diagram
+    ➢ Requirement traceability Matrix
 
 ## FEATURES
 ❖ A PIN-based lock screen or Power button hold limit to prevent accidental inputs.
