@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
+<<<<<<< HEAD
 <!-- Written by QtCreator 6.0.2, 2025-04-07T23:02:24. -->
+=======
+<!-- Written by QtCreator 6.0.2, 2025-04-05T00:16:30. -->
+>>>>>>> iteration-5---jonah
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -236,8 +240,13 @@
     <valuelist type="QVariantList" key="CustomOutputParsers"/>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
+<<<<<<< HEAD
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/student/Desktop/COMP3004-3/FinalProject.pro</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/student/Desktop/COMP3004-3/FinalProject.pro</value>
+=======
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/student/FinalProject/FinalProject.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/student/FinalProject/FinalProject.pro</value>
+>>>>>>> iteration-5---jonah
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>

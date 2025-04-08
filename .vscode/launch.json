@@ -8,8 +8,13 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
+<<<<<<< HEAD
       "cwd": "c:/Users/Hayden Chung/Desktop/COMP3004-3",
       "program": "c:/Users/Hayden Chung/Desktop/COMP3004-3/build/Debug/outDebug",
+=======
+      "cwd": "c:/Users/Hayden Chung/Desktop/COMP3004",
+      "program": "c:/Users/Hayden Chung/Desktop/COMP3004/build/Debug/outDebug",
+>>>>>>> iteration-5---jonah
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

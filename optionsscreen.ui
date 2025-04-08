@@ -65,6 +65,7 @@
     <string>Errors Logs</string>
    </property>
   </widget>
+<<<<<<< HEAD
   <widget class="QPushButton" name="eventLogButton">
  <property name="geometry">
   <rect>
@@ -94,6 +95,21 @@
 </widget>
 
 
+=======
+  <widget class="QPushButton" name="suspendResumeButton">
+   <property name="geometry">
+    <rect>
+     <x>720</x>
+     <y>90</y>
+     <width>161</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Suspend Basal</string>
+   </property>
+  </widget>
+>>>>>>> iteration-5---jonah
  </widget>
  <resources/>
  <connections/>
