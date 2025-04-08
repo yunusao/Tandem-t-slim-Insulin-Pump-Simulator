@@ -6,7 +6,9 @@
 #include "errorlogpage.h"
 #include "eventlogpage.h"
 
+
 class HomeScreen;
+class ProfilePage;
 
 namespace Ui {
 class OptionsScreen;

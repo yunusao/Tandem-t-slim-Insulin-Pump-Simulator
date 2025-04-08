@@ -1,6 +1,7 @@
 #include "optionsscreen.h"
 #include "ui_optionsscreen.h"
 #include "homescreen.h"
+#include "eventlogpage.h"
 #include <QMessageBox>
 
 #include "profilepage.h"
