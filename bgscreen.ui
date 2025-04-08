@@ -59,9 +59,9 @@
      </widget>
     </item>
     <item row="3" column="0">
-     <widget class="QPushButton" name="btnDecimal">
+     <widget class="QPushButton" name="btnPlusMinus">
       <property name="text">
-       <string>.</string>
+       <string>+/=</string>
       </property>
      </widget>
     </item>

@@ -15,8 +15,6 @@ ConfirmBolusScreen::ConfirmBolusScreen(QWidget *parent) :
     connect(ui->confirmButton, &QPushButton::clicked, this, [=]() {
         QString units = ui->labelUnitsToDeliver->text();  // get the displayed units
         finalDeliveryScreen->setTotalUnits(units);        // pass to next screen
-        finalDeliveryScreen->setFood(units);
-        finalDeliveryScreen->setCorrection(correctionValue);
         this->hide();  // Hide this screen
         finalDeliveryScreen->show();  // Show the new one
     });
@@ -48,8 +46,4 @@ void ConfirmBolusScreen::setBG(QString value)
 void ConfirmBolusScreen::setUnits(QString value)
 {
     ui->labelUnitsToDeliver->setText(value + " u");
-}
-
-void ConfirmBolusScreen::setCorrection(QString value){
-    correctionValue = value;
 }

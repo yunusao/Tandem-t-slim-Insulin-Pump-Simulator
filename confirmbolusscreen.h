@@ -19,12 +19,10 @@ public:
     void setCarbs(QString value);
     void setBG(QString value);
     void setUnits(QString value);
-    void setCorrection(QString value);
 
 private:
     Ui::ConfirmBolusScreen *ui;
     FinalDeliveryScreen *finalDeliveryScreen;
-    QString correctionValue;
 };
 
 #endif // CONFIRMBOLUSSCREEN_H

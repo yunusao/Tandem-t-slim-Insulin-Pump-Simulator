@@ -6,7 +6,10 @@
 #include <QDateTime>
 #include <QPixmap>
 #include <QPainter>
-#include <QList>
+#include <QSqlQuery>
+#include <QDebug>
+#include <QTableWidget>
+#include <QString>
 
 #include "bolusscreen.h"
 #include "optionsscreen.h"
@@ -34,29 +37,28 @@ public:
     void resumeBasal(bool logEvent = true, const QString &reason = "Basal insulin delivery resumed.");
 
 
-    bool isBasalActive() const;
-    void suspendBasal(bool logEvent = true, const QString &reason = "Basal insulin delivery suspended.");
-    void resumeBasal(bool logEvent = true, const QString &reason = "Basal insulin delivery resumed.");
-    void loadActiveUser();
-
-    // Moved to public so other classes can call it.
-    void deliverBolus(double units, int durationMs);
-
 public slots:
     void manualInsulinInjection(double amount);
+    void loadActiveUser();
 
 private slots:
     void updateTime();      // Battery & IOB updates (500ms)
     void updateGraph();     // CGM graph updates (100ms)
+
     void powerPressed();
     void powerReleased();
+
     void powerOff();        // Slot for powerButton_3
+
     void showBolusScreen();
     void showOptionsScreen();
     void returnHome();
+
     void toggleChargingMode();
     void refillInsulin();
+
     void disconnectCGM();   // Slot for Disconnect button
+
 
 private:
     void logError(const QString &message);
@@ -85,18 +87,6 @@ private:
     // Variables used in the graph approach.
     double baseline;
     double amplitude;
-    bool basalActive;  // Track if basal delivery is active (true) or suspended (false)
-
-    // Structure to track extended bolus deliveries.
-    struct BolusDelivery {
-        double totalUnits;
-        double remainingUnits;
-        QDateTime startTime;
-        int durationMs;   // total duration for delivery in ms
-        double rate;      // units per ms (totalUnits/durationMs)
-    };
-
-    QList<BolusDelivery> activeBoluses;
 
     bool basalActive;
 

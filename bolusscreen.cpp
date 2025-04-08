@@ -51,9 +51,6 @@ void BolusScreen::updateCarbs(QString value)
 void BolusScreen::showBgScreen() {
     this->hide();
     bgScreen->setWindowFlags(Qt::Window);  // Standalone window
-    float targetBG = ProfileService::getField(ProfileService::GlucoseTarget).toFloat();
-    if (targetBG == 0) targetBG = 5;
-    bgScreen->setTargetBG(targetBG);
     bgScreen->show();
 }
 
@@ -112,7 +109,7 @@ void BolusScreen::showConfirmBolusScreen()
     // Calculate the bolus components.(AHmid)
     float carbBolus = carbValue / ICR;
 
-    float correctionBolus = (bgValue > targetBG) ? ((bgValue - targetBG) / CF) : 0; //push this to finalDeliveryScreen
+    float correctionBolus = (bgValue > targetBG) ? ((bgValue - targetBG) / CF) : 0;
 
     float totalBolus = carbBolus + correctionBolus;
 
@@ -128,7 +125,7 @@ void BolusScreen::showConfirmBolusScreen()
 
     // Format the final recommended bolus dose for display.
     QString recommendedDose = QString::number(finalBolus, 'f', 1);
-    QString correctionValue = QString::number(correctionBolus,'f',1);
+
 
     // Hardcoded units to deliver (for now) (Ahmid: i replaced this with the recommended dose)
     //QString units = "3.65";
@@ -136,7 +133,6 @@ void BolusScreen::showConfirmBolusScreen()
     confirmBolusScreen->setCarbs(cleanCarbs);
     confirmBolusScreen->setBG(cleanBG);
     confirmBolusScreen->setUnits(recommendedDose);
-    confirmBolusScreen->setCorrection(correctionValue);
 
     this->hide();
     confirmBolusScreen->setWindowFlags(Qt::Window);

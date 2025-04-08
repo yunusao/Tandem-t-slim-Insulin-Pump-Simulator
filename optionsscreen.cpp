@@ -1,11 +1,7 @@
 #include "optionsscreen.h"
 #include "ui_optionsscreen.h"
 #include "homescreen.h"
-<<<<<<< HEAD
 #include <QMessageBox>
-=======
-#include <QMessageBox>   // Include for message dialog
->>>>>>> iteration-5---jonah
 
 #include "profilepage.h"
 OptionsScreen::OptionsScreen(HomeScreen *home, QWidget *parent) :
@@ -48,7 +44,6 @@ void OptionsScreen::on_pushButton_clicked()
     errorLogs->show();
 }
 
-<<<<<<< HEAD
 void OptionsScreen::on_eventLogButton_clicked()
 {
     this->hide();
@@ -75,39 +70,3 @@ void OptionsScreen::updateToggleInsulinLabel()
     }
 }
 
-=======
-void OptionsScreen::updateBasalButtonLabel() {
-    // Set button text based on current basal status
-    if (homeScreen->isBasalActive()) {
-        ui->suspendResumeButton->setText("Suspend Basal");
-    } else {
-        ui->suspendResumeButton->setText("Resume Basal");
-    }
-}
-
-void OptionsScreen::on_suspendResumeButton_clicked()
-{
-    if (homeScreen->isBasalActive()) {
-        // Suspend basal insulin delivery
-        homeScreen->suspendBasal();  // sets basalActive false and logs event
-        ui->suspendResumeButton->setText("Resume Basal");
-        QMessageBox::information(this, "Basal Suspended",
-                                 "Basal insulin delivery has been suspended.");
-    } else {
-        // Resume basal insulin delivery
-        homeScreen->resumeBasal();   // sets basalActive true and logs event
-        ui->suspendResumeButton->setText("Suspend Basal");
-        QMessageBox::information(this, "Basal Resumed",
-                                 "Basal insulin delivery has been resumed.");
-    }
-}
-
-// File: optionsscreen.cpp
-void OptionsScreen::on_eventLogButton_clicked()
-{
-    this->hide();
-    // Refresh and show the event log page
-    errorLogs->loadErrors();
-    errorLogs->show();
-}
->>>>>>> iteration-5---jonah

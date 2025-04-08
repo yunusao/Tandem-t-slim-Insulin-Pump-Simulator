@@ -5,58 +5,38 @@
 #include <QSqlError>
 #include <QFile>
 #include <QTextStream>
-#include <QSqlQuery>
-#include <QSqlError>
 #include <algorithm>
 #include "homescreen.h"
 #include "ui_homescreen.h"
 #include "mainwindow.h"
 
-// Helper function to log errors
+/**
+ * @brief HomeScreen::logError
+ * @param message
+ *
+ * Logs errors into txtt file and inserts into database
+ *
+ */
 void HomeScreen::logError(const QString &message)
 {
-    // Log error to database
+    QFile file("ErrorLogs.txt");
     QSqlQuery query;
     QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-    query.prepare("INSERT INTO errorLogs (timestamp, message) VALUES (:timestamp, :message)");
+    query.prepare("INSERT INTO errorLogs (timestamp, message)"
+              "VALUES (:timestamp, :message)");
     query.bindValue(":timestamp", timestamp);
     query.bindValue(":message", message);
     if (!query.exec()){
-        qDebug() << "Failed to log error to database:" << query.lastError().text();
+        qDebug() << "Failed to upload error online";
     }
     emit errorSaved();
-
-    // Also log to file
-    QFile file("ErrorLogs.txt");
+    qDebug() << "Reached";
     if (file.open(QIODevice::Append | QIODevice::Text))
     {
         QTextStream out(&file);
-        out << timestamp << " - " << message << "\n";
+        out << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+            << " - " << message << "\n";
         file.close();
-    }
-}
-
-// deliverBolus: if durationMs == 0, deliver immediately; otherwise, schedule an extended delivery.
-void HomeScreen::deliverBolus(double units, int durationMs)
-{
-    if (durationMs <= 0) {
-        if (units > insulinRemainingUnits)
-            units = insulinRemainingUnits;
-        insulinRemainingUnits -= units;
-        insulinOnBoard += units;
-        ui->insulinRemainingBar->setValue(insulinRemainingUnits);
-        ui->insulinRemaining->setText(QString::number(insulinRemainingUnits) + "U");
-        ui->label_2->setText(QString::number(insulinOnBoard, 'f', 1) + " u");
-        logError(QString("Immediate bolus: %1 U delivered.").arg(units, 0, 'f', 1));
-    } else {
-        BolusDelivery bolus;
-        bolus.totalUnits = units;
-        bolus.remainingUnits = units;
-        bolus.durationMs = durationMs;
-        bolus.startTime = QDateTime::currentDateTime();
-        bolus.rate = units / static_cast<double>(durationMs); // units per ms
-        activeBoluses.append(bolus);
-        logError(QString("Extended bolus: %1 U over %2 ms scheduled.").arg(units, 0, 'f', 1).arg(durationMs));
     }
 }
 
@@ -76,15 +56,13 @@ HomeScreen::HomeScreen(QWidget *parent)
 {
     ui->setupUi(this);
     ui->powerOffOverlay->show(); // Show overlay when off
-
     loadActiveUser();
-
     // Set progress bar ranges.
     ui->batteryBar->setRange(0, 100);
     ui->insulinRemainingBar->setRange(0, 300);
 
     bolusScreen = new BolusScreen(this);
-    optionsScreen = new OptionsScreen(this, this);
+    optionsScreen = new OptionsScreen(this,this);
 
     // Hide secondary screens.
     bolusScreen->hide();
@@ -96,15 +74,17 @@ HomeScreen::HomeScreen(QWidget *parent)
     connect(bolusScreen->findChild<QPushButton*>("homeButton"), &QPushButton::clicked, this, &HomeScreen::returnHome);
     connect(optionsScreen->findChild<QPushButton*>("homeButton"), &QPushButton::clicked, this, &HomeScreen::returnHome);
 
-    // Connect power buttons.
+    // Connect power on button (powerButton_2).
     connect(ui->powerButton_2, &QPushButton::pressed, this, &HomeScreen::powerPressed);
     connect(ui->powerButton_2, &QPushButton::released, this, &HomeScreen::powerReleased);
+
+    // Connect dedicated power off button (powerButton_3).
     connect(ui->powerButton_3, &QPushButton::clicked, this, &HomeScreen::powerOff);
 
     // Connect the Disconnect button.
     connect(ui->Disconnect, &QPushButton::clicked, this, &HomeScreen::disconnectCGM);
 
-    // Set timer intervals.
+    // Set timer intervals (do not start them yet).
     timer->setInterval(500);
     connect(timer, &QTimer::timeout, this, &HomeScreen::updateTime);
 
@@ -117,7 +97,7 @@ HomeScreen::HomeScreen(QWidget *parent)
     // Initialize lastGraphY to the vertical center of the graph.
     lastGraphY = ui->graph->height() / 2;
 
-    // Initialize simulation variables.
+    // Initialize our new variables.
     baseline = 5.0;
     amplitude = 1.0;
 
@@ -133,11 +113,13 @@ HomeScreen::~HomeScreen()
 
 void HomeScreen::updateTime()
 {
+    // Update time and date display.
     QTime time = QTime::currentTime();
     QDate date = QDate::currentDate();
     ui->labelTime->setText(time.toString("hh:mm AP"));
     ui->labelDate->setText(date.toString("dd MMM"));
 
+    // Update the elapsed time since power-on.
     if (poweredOn) {
         int elapsedMs = powerOnTime.msecsTo(QDateTime::currentDateTime());
         QTime elapsed = QTime::fromMSecsSinceStartOfDay(elapsedMs);
@@ -146,9 +128,10 @@ void HomeScreen::updateTime()
         ui->timeWindow->setText("0:00:00");
     }
 
+    // Update battery and IOB only when the device is on.
     if (poweredOn) {
         batteryCounter++;
-        if (batteryCounter % 4 == 0) {
+        if (batteryCounter % 4 == 0) {  // Every 2 seconds.
             if (!chargingMode)
                 batteryLevel = std::max(0, batteryLevel - 1);
             else
@@ -157,26 +140,8 @@ void HomeScreen::updateTime()
         ui->batteryBar->setValue(batteryLevel);
         ui->batteryLabel->setText(QString::number(batteryLevel) + "%");
 
-        // Process active extended bolus deliveries.
-        double dt = 500.0; // ms per tick
-        for (int i = activeBoluses.size() - 1; i >= 0; i--) {
-            BolusDelivery &bolus = activeBoluses[i];
-            double delivered = bolus.rate * dt;
-            if (delivered > bolus.remainingUnits)
-                delivered = bolus.remainingUnits;
-            bolus.remainingUnits -= delivered;
-            insulinOnBoard += delivered;
-            insulinRemainingUnits -= delivered;
-            if (insulinRemainingUnits < 0)
-                insulinRemainingUnits = 0;
-            ui->insulinRemainingBar->setValue(insulinRemainingUnits);
-            ui->insulinRemaining->setText(QString::number(insulinRemainingUnits) + "U");
-            ui->label_2->setText(QString::number(insulinOnBoard, 'f', 1) + " u");
-            if (bolus.remainingUnits <= 0)
-                activeBoluses.removeAt(i);
-        }
-
         if (insulinOnBoard > 0) {
+            // Decay insulin on board at 1/4th of previous rate.
             insulinOnBoard = std::max(0.0, insulinOnBoard - 0.125);
             ui->label_2->setText(QString::number(insulinOnBoard, 'f', 1) + " u");
 
@@ -190,12 +155,13 @@ void HomeScreen::updateTime()
             }
         }
 
+        // --- Error Handling for Battery ---
         static bool batteryLowAlertShown = false;
         if (batteryLevel <= 20 && batteryLevel > 0) {
             if (!batteryLowAlertShown) {
-                QMetaObject::invokeMethod(this, [this](){
+                QTimer::singleShot(0, this, [this](){
                     QMessageBox::warning(this, "Low Battery", "Battery is low. Please charge the device.");
-                }, Qt::QueuedConnection);
+                });
                 logError("Low Battery: Battery level at " + QString::number(batteryLevel) + "%. Please charge the device.");
                 logEvent("Battery Low", QString::number(batteryLevel), "Battery is low");
 
@@ -205,21 +171,20 @@ void HomeScreen::updateTime()
             batteryLowAlertShown = false;
         }
         if (batteryLevel == 0) {
-            QMetaObject::invokeMethod(this, [this](){
+            QTimer::singleShot(0, this, [this](){
                 QMessageBox::warning(this, "Battery Depleted", "Battery depleted. Device powering off.");
             });
             logError("Battery Depleted: Battery level reached 0%. Device powering off. To continue pumping, please charge. Contact support at 613-807-9580");
             logEvent("Battery Depleted", "0", "Device powered off due to empty battery");
-            }, Qt::QueuedConnection);
-            logError("Battery Depleted: Battery level reached 0%. Device powering off.");
             powerOff();
         }
 
+        // --- Error Handling for Insulin ---
         static bool insulinLowAlertShown = false;
         if (insulinRemainingUnits <= 60) {
             if (!insulinLowAlertShown) {
-                QMetaObject::invokeMethod(this, [this](){
-                    QMessageBox::warning(this, "Low Insulin", "Insulin cartridge is low. Please refill your insulin cartridge.");
+                QMetaObject::invokeMethod(QApplication::activeWindow(), [this]() {
+                    QMessageBox::warning(QApplication::activeWindow(), "Low Insulin", "Insulin cartridge is low. Please refill your insulin cartridge.");
                 }, Qt::QueuedConnection);
 
                 logError("Low Insulin: Insulin remaining at " + QString::number(insulinRemainingUnits) + "U. Please refill the cartridge.");
@@ -231,7 +196,9 @@ void HomeScreen::updateTime()
         } else {
             insulinLowAlertShown = false;
         }
-    } else {
+    }
+    else {
+        // When off, battery updates are paused unless charging.
         if (chargingMode) {
             batteryCounter++;
             if (batteryCounter % 4 == 0)
@@ -248,13 +215,17 @@ void HomeScreen::updateGraph()
         if (cgmPixmap.isNull()) {
             QSize size = ui->graph->size();
             cgmPixmap = QPixmap(size);
+            // Fill with dark background.
             cgmPixmap.fill(QColor("#1e1e1e"));
         }
+        // Scroll the current pixmap left by 1 pixel.
         QPixmap scrolled = cgmPixmap.copy(1, 0, cgmPixmap.width() - 1, cgmPixmap.height());
+        // Fill with dark background.
         cgmPixmap.fill(QColor("#1e1e1e"));
         QPainter painter(&cgmPixmap);
         painter.drawPixmap(0, 0, scrolled);
 
+        // Deterministic up-and-down variation for both baseline and amplitude.
         static bool baselineGoingUp = true;
         static bool amplitudeGoingUp = true;
         double baselineStep = 0.005;
@@ -277,15 +248,17 @@ void HomeScreen::updateGraph()
         double t = cgmTimeTick / 10.0;
         double fastSine = std::sin(t);
         double newValue = baseline + fastSine * amplitude;
+
         if (newValue < 3.9) newValue = 3.9;
         if (newValue > 10.0) newValue = 10.0;
 
+        // Update the current blood glucose label.
         ui->currentBldGlu->setText(QString::number(newValue, 'f', 1));
 
         int graphHeight = cgmPixmap.height();
         int yPos = graphHeight - static_cast<int>(((newValue - 3.9) / (10.0 - 3.9)) * graphHeight);
 
-        int noise = QRandomGenerator::global()->bounded(5u) - 2;
+        int noise = QRandomGenerator::global()->bounded(5u) - 2; // [-2,2]
         yPos += noise;
         if (yPos < 0) yPos = 0;
         if (yPos >= graphHeight) yPos = graphHeight - 1;
@@ -317,6 +290,7 @@ void HomeScreen::updateGraph()
         }
 
     }
+    // When off, graphTimer is stopped so no updates occur.
 }
 
 void HomeScreen::powerPressed()
@@ -326,6 +300,7 @@ void HomeScreen::powerPressed()
 
 void HomeScreen::powerReleased()
 {
+    // This slot is for powerButton_2 (power on)
     int duration = pressStartTime.msecsTo(QDateTime::currentDateTime());
     if (!poweredOn) {
         if (duration >= 3000) {
@@ -343,9 +318,11 @@ void HomeScreen::powerReleased()
 
 void HomeScreen::powerOff()
 {
+    // This slot is for powerButton_3 (power off).
     poweredOn = false;
     ui->powerOffOverlay->show();
     graphTimer->stop();
+    // Battery timer remains running so that, if charging is active, the battery level can still update.
 }
 
 void HomeScreen::showBolusScreen()
@@ -360,7 +337,6 @@ void HomeScreen::showBolusScreen()
 void HomeScreen::showOptionsScreen()
 {
     this->hide();
-    optionsScreen->updateBasalButtonLabel();
     optionsScreen->setWindowFlags(Qt::Window);
     optionsScreen->show();
 }
@@ -375,7 +351,10 @@ void HomeScreen::returnHome()
 void HomeScreen::toggleChargingMode()
 {
     chargingMode = !chargingMode;
-    ui->chargingButton->setText(chargingMode ? "Stop Charging" : "Start Charging");
+    if (chargingMode)
+        ui->chargingButton->setText("Stop Charging");
+    else
+        ui->chargingButton->setText("Start Charging");
 }
 
 void HomeScreen::refillInsulin()
@@ -389,7 +368,6 @@ void HomeScreen::refillInsulin()
 
 void HomeScreen::manualInsulinInjection(double amount)
 {
-<<<<<<< HEAD
     // If amount is greater than available, limit it.
     if (amount > insulinRemainingUnits)
         amount = insulinRemainingUnits;
@@ -406,58 +384,27 @@ void HomeScreen::manualInsulinInjection(double amount)
     logError(msg);;
     QString durationMsg = QString("Insulin duration: %1 hours estimated for %2U bolus").arg("4").arg(amount, 0, 'f', 1);
     logEvent("Duration", QString::number(amount, 'f', 1), durationMsg);
-=======
-    deliverBolus(amount, 0);
->>>>>>> iteration-5---jonah
 }
 
+// New slot for Disconnect button.
 void HomeScreen::disconnectCGM()
 {
     QMessageBox::warning(this, "CGM Disconnection",
         "CGM disconnection trigger detected. Insulin delivery suspended. Please check your CGM connection and press 'OK' once connected.");
     logError("CGM Disconnection: Insulin delivery suspended. Check CGM connection.");
-<<<<<<< HEAD
     logEvent("CGM Disconnected", "0", "CGM disconnection trigger detected");
 
-=======
-    suspendBasal();
->>>>>>> iteration-5---jonah
 }
 
-bool HomeScreen::isBasalActive() const
-{
-    return basalActive;
-}
-
-void HomeScreen::suspendBasal(bool logEvent, const QString &reason)
-{
-    if (!basalActive)
-        return;
-    basalActive = false;
-    if (logEvent)
-        logError(reason);
-}
-
-void HomeScreen::resumeBasal(bool logEvent, const QString &reason)
-{
-    if (basalActive)
-        return;
-    basalActive = true;
-    if (logEvent)
-        logError(reason);
-}
-
-void HomeScreen::loadActiveUser()
-{
+void HomeScreen::loadActiveUser() {
     ui->activeUserTable->clearContents();
     ui->activeUserTable->setColumnCount(5);
     ui->activeUserTable->setRowCount(1);
 
     if (ProfileService::getId() == -1) {
         ui->activeUserTable->setRowCount(0);
-        return;
     }
-    ui->activeUserTable->setItem(0, 0, new QTableWidgetItem(ProfileService::getField(ProfileService::Name).toString()));
+    ui->activeUserTable->setItem(0,0, new QTableWidgetItem(ProfileService::getField(ProfileService::Name).toString()));
     ui->activeUserTable->setItem(0, 1, new QTableWidgetItem(QString::number(ProfileService::getField(ProfileService::BasalRate).toDouble())));
     ui->activeUserTable->setItem(0, 2, new QTableWidgetItem(QString::number(ProfileService::getField(ProfileService::CarbRatio).toDouble())));
     ui->activeUserTable->setItem(0, 3, new QTableWidgetItem(QString::number(ProfileService::getField(ProfileService::CorrectionFactor).toDouble())));
@@ -468,7 +415,6 @@ void HomeScreen::loadActiveUser()
     ui->activeUserTable->resizeColumnToContents(3);
     ui->activeUserTable->resizeColumnToContents(4);
 }
-<<<<<<< HEAD
 
 void HomeScreen::logEvent(const QString &eventType, const QString &amount, const QString &notes)
 {
@@ -522,5 +468,3 @@ void HomeScreen::resumeBasal(bool logEvent1, const QString &reason) {
 
 
 
-=======
->>>>>>> iteration-5---jonah

@@ -131,7 +131,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLineEdit" name="corrEdit">
+  <widget class="QLineEdit" name="carbEdit">
    <property name="geometry">
     <rect>
      <x>210</x>
@@ -144,7 +144,7 @@
     <string/>
    </property>
   </widget>
-  <widget class="QLineEdit" name="carbEdit">
+  <widget class="QLineEdit" name="corrEdit">
    <property name="geometry">
     <rect>
      <x>210</x>

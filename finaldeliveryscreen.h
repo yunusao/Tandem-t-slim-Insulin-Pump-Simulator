@@ -18,7 +18,6 @@ public:
     ~FinalDeliveryScreen();
     void setTotalUnits(QString units);  // Pass value like "3.65"
     void setFood(QString value);
-    void setCorrection(QString value);
 
 private:
     Ui::FinalDeliveryScreen *ui;

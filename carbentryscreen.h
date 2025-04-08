@@ -21,7 +21,7 @@ private:
 
     void handleDigit(const QString &digit);
     void clearInput();
-    void toggleDecimalPoint();
+    void toggleSign();
 
  signals:
     void carbsEntered(QString carbValue);

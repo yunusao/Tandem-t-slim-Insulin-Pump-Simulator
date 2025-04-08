@@ -36,7 +36,6 @@ private:
     bgscreen *bgScreen;
     CorrectionSuggestionScreen *correctionScreen;
     ConfirmBolusScreen *confirmBolusScreen;
-    //float bgTarget;
 };
 
 #endif // BOLUSSCREEN_H

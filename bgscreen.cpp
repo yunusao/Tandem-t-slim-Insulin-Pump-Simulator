@@ -25,13 +25,13 @@ bgscreen::bgscreen(QWidget *parent) :
 
 
     connect(ui->btnClear, &QPushButton::clicked, this, &bgscreen::clearInput);
-    connect(ui->btnDecimal, &QPushButton::clicked, this, &bgscreen::insertDecimalPoint);
+    connect(ui->btnPlusMinus, &QPushButton::clicked, this, &bgscreen::toggleSign);
 
     // Confirm
     connect(ui->confirmButton, &QPushButton::clicked, this, [=]() {
         bool ok;
         float bgValue = bgInput.toFloat(&ok);
-        //float targetBG = 5.0;  // Can make this dynamic later
+        float targetBG = 5.0;  // Can make this dynamic later
 
         if (ok) {
             if (bgValue != targetBG) {
@@ -94,23 +94,16 @@ void bgscreen::clearInput()
     ui->labelBgValue->setText(bgInput);
 }
 
-void bgscreen::insertDecimalPoint()
+void bgscreen::toggleSign()
 {
-    if (!bgInput.contains('.')) {
-            if (bgInput.isEmpty()) {
-                bgInput = "0.";  // Start with "0." if empty
-            } else {
-                bgInput += ".";
-            }
-            ui->labelBgValue->setText(bgInput);
-        }
+    if (bgInput.startsWith("-")) {
+        bgInput.remove(0, 1);
+    } else if (bgInput != "0") {
+        bgInput = "-" + bgInput;
+    }
+    ui->labelBgValue->setText(bgInput);
 }
 
 void bgscreen::setCorrectionScreen(CorrectionSuggestionScreen *screen) {
     correctionScreen = screen;
 }
-
-void bgscreen::setTargetBG(float value){
-    targetBG = value;
-}
-
