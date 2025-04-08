@@ -16,16 +16,18 @@ public:
     explicit bgscreen(QWidget *parent = nullptr);
     ~bgscreen();
     void setCorrectionScreen(CorrectionSuggestionScreen *screen);
+    void setTargetBG(float value);
 
 private:
     Ui::bgscreen *ui;
     QString bgInput;
     CorrectionSuggestionScreen *correctionScreen;
+    float targetBG;
 
 private slots:
     void handleDigit(const QString &digit);
     void clearInput();
-    void toggleSign();
+    void insertDecimalPoint();
 signals:
     void bgEntered(QString value);
 };
