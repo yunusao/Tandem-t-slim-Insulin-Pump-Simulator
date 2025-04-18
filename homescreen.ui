@@ -286,9 +286,9 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>0</y>
+     <y>50</y>
      <width>911</width>
-     <height>341</height>
+     <height>291</height>
     </rect>
    </property>
    <property name="autoFillBackground">
@@ -311,7 +311,7 @@
     <property name="geometry">
      <rect>
       <x>710</x>
-      <y>150</y>
+      <y>140</y>
       <width>141</width>
       <height>131</height>
      </rect>
@@ -323,8 +323,8 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>110</y>
+      <x>0</x>
+      <y>0</y>
       <width>361</width>
       <height>71</height>
      </rect>
@@ -333,6 +333,135 @@
      <string>Pump is Off 
 Hold Power Button to Start</string>
     </property>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>60</y>
+      <width>591</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="button1">
+       <property name="minimumSize">
+        <size>
+         <width>160</width>
+         <height>160</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>160</width>
+         <height>160</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    border-radius: 80px;        /* Half of width/height */
+    background-color: #444;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+QPushButton:hover {
+    background-color: #666;
+}
+QPushButton:checked {
+    background-color: #2ecc71;  /* Green */
+}</string>
+       </property>
+       <property name="text">
+        <string>1</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="button2">
+       <property name="minimumSize">
+        <size>
+         <width>160</width>
+         <height>160</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>160</width>
+         <height>160</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    border-radius: 80px;        /* Half of width/height */
+    background-color: #444;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+QPushButton:hover {
+    background-color: #666;
+}
+QPushButton:checked {
+    background-color: #2ecc71;  /* Green */
+}</string>
+       </property>
+       <property name="text">
+        <string>2</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="button3">
+       <property name="minimumSize">
+        <size>
+         <width>160</width>
+         <height>160</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>160</width>
+         <height>160</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    border-radius: 80px;        /* Half of width/height */
+    background-color: #444;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+QPushButton:hover {
+    background-color: #666;
+}
+QPushButton:checked {
+    background-color: #2ecc71;  /* Green */
+}</string>
+       </property>
+       <property name="text">
+        <string>3</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QPushButton" name="Disconnect">

@@ -91,6 +91,11 @@ private:
 
     QList<BolusDelivery> activeBoluses;
 
+    QString enteredCode;
+    void handlePasskeyDigit(int digit);
+    void resetPasskeyButtons();
+
+
 signals:
     void errorSaved();
 };

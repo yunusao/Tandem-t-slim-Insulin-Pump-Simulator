@@ -74,6 +74,12 @@ HomeScreen::HomeScreen(QWidget *parent)
     connect(bolusScreen->findChild<QPushButton*>("homeButton"), &QPushButton::clicked, this, &HomeScreen::returnHome);
     connect(optionsScreen->findChild<QPushButton*>("homeButton"), &QPushButton::clicked, this, &HomeScreen::returnHome);
 
+    enteredCode = "";
+
+    connect(ui->button1, &QPushButton::clicked, this, [=]() { handlePasskeyDigit(1); });
+    connect(ui->button2, &QPushButton::clicked, this, [=]() { handlePasskeyDigit(2); });
+    connect(ui->button3, &QPushButton::clicked, this, [=]() { handlePasskeyDigit(3); });
+
     // Connect power on button (powerButton_2).
     connect(ui->powerButton_2, &QPushButton::pressed, this, &HomeScreen::powerPressed);
     connect(ui->powerButton_2, &QPushButton::released, this, &HomeScreen::powerReleased);
@@ -109,6 +115,37 @@ HomeScreen::HomeScreen(QWidget *parent)
 HomeScreen::~HomeScreen()
 {
     delete ui;
+}
+
+void HomeScreen::handlePasskeyDigit(int digit)
+{
+    enteredCode += QString::number(digit);
+
+    // Visually mark the button as pressed
+    if (digit == 1) ui->button1->setChecked(true);
+    if (digit == 2) ui->button2->setChecked(true);
+    if (digit == 3) ui->button3->setChecked(true);
+
+    if (enteredCode.length() == 3) {
+        if (enteredCode == "123") {
+            poweredOn = true;
+            powerOnTime = QDateTime::currentDateTime();
+            batteryCounter = 0;
+            ui->powerOffOverlay->hide();
+            timer->start();
+            graphTimer->start();
+        } else {
+            QTimer::singleShot(1000, this, &HomeScreen::resetPasskeyButtons);
+        }
+    }
+}
+
+void HomeScreen::resetPasskeyButtons()
+{
+    enteredCode.clear();
+    ui->button1->setChecked(false);
+    ui->button2->setChecked(false);
+    ui->button3->setChecked(false);
 }
 
 void HomeScreen::updateTime()
@@ -323,6 +360,7 @@ void HomeScreen::powerOff()
     ui->powerOffOverlay->show();
     graphTimer->stop();
     // Battery timer remains running so that, if charging is active, the battery level can still update.
+    resetPasskeyButtons();
 }
 
 void HomeScreen::showBolusScreen()
