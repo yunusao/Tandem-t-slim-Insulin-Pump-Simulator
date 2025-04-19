@@ -4,50 +4,79 @@
 #include "homescreen.h" // To call manualInsulinInjection
 #include "correctionsuggestionscreen.h"
 
+/**
+ * @brief BolusScreen::BolusScreen
+ * Constructor: Initializes the bolus screen and connects button actions to their respective slots.
+ */
 BolusScreen::BolusScreen(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::BolusScreen)
 {
     ui->setupUi(this);
-    carbScreen = new CarbEntryScreen(this);  // Parent = BolusScreen
-    bgScreen = new bgscreen(this);             // Parent = BolusScreen
+
+    // Initialize and hide child screens
+    carbScreen = new CarbEntryScreen(this);
+    bgScreen = new bgscreen(this);
     correctionScreen = new CorrectionSuggestionScreen(this);
     confirmBolusScreen = new ConfirmBolusScreen(this);
 
     carbScreen->hide();
     bgScreen->hide();
-    bgScreen->setCorrectionScreen(correctionScreen);
     correctionScreen->hide();
     confirmBolusScreen->hide();
 
+    // Pass reference to correction screen into bgScreen
+    bgScreen->setCorrectionScreen(correctionScreen);
+
+    // Navigation buttons
     connect(ui->carbsButton, &QPushButton::clicked, this, &BolusScreen::showCarbEntryScreen);
     connect(ui->bgButton, &QPushButton::clicked, this, &BolusScreen::showBgScreen);
 
+    // Receive input from child screens
     connect(carbScreen, &CarbEntryScreen::carbsEntered, this, &BolusScreen::updateCarbs);
     connect(bgScreen, &bgscreen::bgEntered, this, &BolusScreen::updateBG);
     connect(correctionScreen, &CorrectionSuggestionScreen::correctionConfirmed, this, &BolusScreen::updateBG);
+
+    // Confirm bolus
     connect(ui->confirmButton, &QPushButton::clicked, this, &BolusScreen::showConfirmBolusScreen);
 
-    // Connect new INSULIN button to manual injection slot
+    // Manual insulin delivery
     connect(ui->insulinButton, &QPushButton::clicked, this, &BolusScreen::showInsulinDialog);
 }
 
+/**
+ * @brief BolusScreen::~BolusScreen
+ * Destructor
+ */
 BolusScreen::~BolusScreen()
 {
     delete ui;
 }
 
+/**
+ * @brief BolusScreen::showCarbEntryScreen
+ * Navigates to the Carb Entry Screen
+ */
 void BolusScreen::showCarbEntryScreen() {
     this->hide();
     carbScreen->setWindowFlags(Qt::Window);  // Standalone window
     carbScreen->show();
 }
 
+/**
+ * @brief BolusScreen::updateCarbs
+ * Updates the carbsButton label with the user-entered carbohydrate value.
+ * @param value Carbs input string
+ */
 void BolusScreen::updateCarbs(QString value)
 {
     ui->carbsButton->setText(value + "\n" + "grams");
 }
 
+/**
+ * @brief BolusScreen::showBgScreen
+ * Navigates to the BG Entry Screen and passes the target BG
+ */
 void BolusScreen::showBgScreen() {
     this->hide();
     bgScreen->setWindowFlags(Qt::Window);  // Standalone window
@@ -57,11 +86,20 @@ void BolusScreen::showBgScreen() {
     bgScreen->show();
 }
 
+/**
+ * @brief BolusScreen::updateBG
+ * Updates the bgButton label with the user-entered blood glucose value.
+ * @param value BG input string
+ */
 void BolusScreen::updateBG(QString value)
 {
     ui->bgButton->setText(value + "\n" + "mmol/L");
 }
 
+/**
+ * @brief BolusScreen::showInsulinDialog
+ * Prompts user for manual insulin units to deliver and applies it through HomeScreen.
+ */
 void BolusScreen::showInsulinDialog() {
     bool ok;
     double insulinAmount = QInputDialog::getDouble(this, "Manual Insulin Delivery",
@@ -74,6 +112,11 @@ void BolusScreen::showInsulinDialog() {
          }
     }
 }
+
+/**
+ * @brief BolusScreen::on_backButton_clicked
+ * Navigates back to the HomeScreen
+ */
 void BolusScreen::on_backButton_clicked()
 {
     this->hide();
@@ -81,14 +124,19 @@ void BolusScreen::on_backButton_clicked()
         parentWidget()->show();
     }
 }
+
+/**
+ * @brief BolusScreen::showConfirmBolusScreen
+ * Computes the recommended bolus amount and sends all values to ConfirmBolusScreen.
+ */
 void BolusScreen::showConfirmBolusScreen()
 {
     QString carbs = ui->carbsButton->text();  // e.g. "38\ngrams"
     QString bg = ui->bgButton->text();        // e.g. "4.5\nmmol/L"
 
     // Optional: clean up formatting
-    QString cleanCarbs = carbs.split("\n").first();  // "38"
-    QString cleanBG = bg.split("\n").first();    // "4.5"
+    QString cleanCarbs = carbs.split("\n").first();
+    QString cleanBG = bg.split("\n").first();
 
     // Converting input strings to floats.(Ahmid)
     bool okCarbs, okBG;
@@ -133,11 +181,13 @@ void BolusScreen::showConfirmBolusScreen()
     // Hardcoded units to deliver (for now) (Ahmid: i replaced this with the recommended dose)
     //QString units = "3.65";
 
+    //Pass values to confirm screen
     confirmBolusScreen->setCarbs(cleanCarbs);
     confirmBolusScreen->setBG(cleanBG);
     confirmBolusScreen->setUnits(recommendedDose);
     confirmBolusScreen->setCorrection(correctionValue);
 
+    //Show confirmation screen
     this->hide();
     confirmBolusScreen->setWindowFlags(Qt::Window);
     confirmBolusScreen->show();

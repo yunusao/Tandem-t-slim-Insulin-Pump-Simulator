@@ -1,12 +1,17 @@
 #include "correctionsuggestionscreen.h"
 #include "ui_correctionsuggestionscreen.h"
 
+/**
+ * @brief CorrectionSuggestionScreen::CorrectionSuggestionScreen
+ * Constructor: Initializes the correction screen UI and connects buttons to handle confirm, cancel, and home.
+ */
 CorrectionSuggestionScreen::CorrectionSuggestionScreen(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::CorrectionSuggestionScreen)
 {
     ui->setupUi(this);
 
+    //Home Button
     connect(ui->homeButton, &QPushButton::clicked, this, [=]() {
         this->hide();  // Hide CorrectionSuggestionScreen
 
@@ -19,8 +24,9 @@ CorrectionSuggestionScreen::CorrectionSuggestionScreen(QWidget *parent) :
         }
     });
 
+    //Confirm button
     connect(ui->confirmButton, &QPushButton::clicked, this, [=]() {
-        emit correctionConfirmed(bgValueRaw);           // ✅ Send it exactly as-is
+        emit correctionConfirmed(bgValueRaw);
 
         this->hide();
 
@@ -29,6 +35,7 @@ CorrectionSuggestionScreen::CorrectionSuggestionScreen(QWidget *parent) :
         }
     });
 
+    // Cancel button
     connect(ui->cancelButton, &QPushButton::clicked, this, [=]() {
         this->hide();  // Hide this screen
 
@@ -40,26 +47,40 @@ CorrectionSuggestionScreen::CorrectionSuggestionScreen(QWidget *parent) :
 
 }
 
+/**
+ * @brief CorrectionSuggestionScreen::~CorrectionSuggestionScreen
+ * Destructor
+ */
 CorrectionSuggestionScreen::~CorrectionSuggestionScreen()
 {
     delete ui;
 }
 
+/**
+ * @brief CorrectionSuggestionScreen::setBG
+ * Sets the displayed BG value and stores raw string value for future use.
+ */
 void CorrectionSuggestionScreen::setBG(QString bg)
 {
     bgValueRaw = bg;
     ui->labelBGValue->setText(bg + " mmol/L");
 }
 
+/**
+ * @brief CorrectionSuggestionScreen::setIOB
+ * Sets the displayed IOB (Insulin On Board) value.
+ */
 void CorrectionSuggestionScreen::setIOB(QString iob)
 {
     ui->labelIOBValue->setText(iob + " u");
 }
 
-void CorrectionSuggestionScreen::setBGMessageBasedOnValue(float bg)
+/**
+ * @brief CorrectionSuggestionScreen::setBGMessageBasedOnValue
+ * Dynamically changes the suggestion message based on whether BG is above or below the target.
+ */
+void CorrectionSuggestionScreen::setBGMessageBasedOnValue(float bg, float target)
 {
-    float target = 5.0;  // You can make this dynamic later if needed
-
     if (bg < target) {
         ui->labelMessage->setText("Your BG is Below Target\nReduce Bolus Calculation?");
     } else {

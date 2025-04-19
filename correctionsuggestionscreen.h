@@ -17,7 +17,7 @@ public:
     void setBG(QString bg);
     void setIOB(QString iob);
 
-    void setBGMessageBasedOnValue(float bg);
+    void setBGMessageBasedOnValue(float bg, float target);
 
 private:
     Ui::CorrectionSuggestionScreen *ui;
