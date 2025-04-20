@@ -94,6 +94,13 @@
 
 ❖ Pump History
 
+
+## DESIGN CONSIDERATIONS
+❖ Bolus calculation done through manual delivery rather than Control-IQ
+
+❖ 1 second = 30mins in simulation
+
+
 ## VISUALS PRESENTATION
 ❖ Include a link to the video(Yunus)    
 
