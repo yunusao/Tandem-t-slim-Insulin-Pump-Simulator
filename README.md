@@ -16,7 +16,7 @@
     ➢ Database- Error log & Profile Page Setup
     
 ❖ Ahmid Kamara:
-    ➢ Tracebility Matrix
+    ➢ Traceability Matrix
     ➢ State Diagrams / Sequence Diagrams
     ➢ Manual Bolus logic
     
