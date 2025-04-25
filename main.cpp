@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
             "carbRatio REAL,"
             "correctionFactor REAL,"
             "glucoseTarget REAL,"
+            "insulationDuration REAL DEFAULT 5.0"
             "active INTEGER DEFAULT 0)";
     if (!query.exec(createTable)){
         qDebug() << "failed 2";

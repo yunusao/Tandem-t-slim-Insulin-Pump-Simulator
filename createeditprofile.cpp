@@ -34,7 +34,11 @@ CreateEditProfile::CreateEditProfile(QWidget *parent, int editProfileId, HomeScr
             ui->carbEdit->setText(q.value("carbRatio").toString());
             ui->corrEdit->setText(q.value("correctionFactor").toString());
             ui->targetEdit->setText(q.value("glucoseTarget").toString());
+            ui->insulationDuration->setText(q.value("insulationDuration").toString());
         }
+    }
+    if (id == -1) {
+       ui->insulationDuration->setText("5.0");
     }
 }
 
@@ -95,13 +99,14 @@ void CreateEditProfile::on_submiButton_clicked()
     double newCorr = ui->corrEdit->text().toDouble();
     double newCarb = ui->carbEdit->text().toDouble();
     double newTarget = ui->targetEdit->text().toDouble();
+    double newDuration = ui->insulationDuration->text().toDouble();
 
     QSqlQuery q;
 
     if (id == -1) {
         // Insert new profile
-        q.prepare("INSERT INTO profiles (name, basalRate, carbRatio, correctionFactor, glucoseTarget) "
-                  "VALUES (:n, :b, :c, :cf, :gt)");
+        q.prepare("INSERT INTO profiles (name, basalRate, carbRatio, correctionFactor, glucoseTarget, insulationDuration) "
+                  "VALUES (:n, :b, :c, :cf, :gt, :is)");
     } else {
         // Fetch previous values for logging changes
         QSqlQuery fetch;
@@ -136,7 +141,7 @@ void CreateEditProfile::on_submiButton_clicked()
         }
 
         // Prepare update query
-        q.prepare("UPDATE profiles SET name=:n, basalRate=:b, carbRatio=:c, correctionFactor=:cf, glucoseTarget=:gt "
+        q.prepare("UPDATE profiles SET name=:n, basalRate=:b, carbRatio=:c, correctionFactor=:cf, glucoseTarget=:gt, insulationDuration=:is "
                   "WHERE id=:id");
         q.bindValue(":id", id);
     }
@@ -147,6 +152,7 @@ void CreateEditProfile::on_submiButton_clicked()
     q.bindValue(":c", newCarb);
     q.bindValue(":cf", newCorr);
     q.bindValue(":gt", newTarget);
+    q.bindValue(":is", newDuration);
 
     if (q.exec()) {
         emit profileSaved();

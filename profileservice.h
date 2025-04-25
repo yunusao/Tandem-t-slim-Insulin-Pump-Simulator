@@ -19,7 +19,8 @@ public:
         BasalRate,
         CarbRatio,
         CorrectionFactor,
-        GlucoseTarget
+        GlucoseTarget,
+        InsulationDuration
     };
     Q_ENUM(User)
 

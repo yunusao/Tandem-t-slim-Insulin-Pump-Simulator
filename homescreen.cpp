@@ -436,7 +436,7 @@ void HomeScreen::disconnectCGM()
 
 void HomeScreen::loadActiveUser() {
     ui->activeUserTable->clearContents();
-    ui->activeUserTable->setColumnCount(5);
+    ui->activeUserTable->setColumnCount(6);
     ui->activeUserTable->setRowCount(1);
 
     if (ProfileService::getId() == -1) {
@@ -447,11 +447,13 @@ void HomeScreen::loadActiveUser() {
     ui->activeUserTable->setItem(0, 2, new QTableWidgetItem(QString::number(ProfileService::getField(ProfileService::CarbRatio).toDouble())));
     ui->activeUserTable->setItem(0, 3, new QTableWidgetItem(QString::number(ProfileService::getField(ProfileService::CorrectionFactor).toDouble())));
     ui->activeUserTable->setItem(0, 4, new QTableWidgetItem(QString::number(ProfileService::getField(ProfileService::GlucoseTarget).toDouble())));
+    ui->activeUserTable->setItem(0, 5, new QTableWidgetItem(QString::number(ProfileService::getField(ProfileService::InsulationDuration).toDouble())));
     ui->activeUserTable->resizeColumnToContents(0);
     ui->activeUserTable->resizeColumnToContents(1);
     ui->activeUserTable->resizeColumnToContents(2);
     ui->activeUserTable->resizeColumnToContents(3);
     ui->activeUserTable->resizeColumnToContents(4);
+    ui->activeUserTable->resizeColumnToContents(5);
 }
 
 void HomeScreen::logEvent(const QString &eventType, const QString &amount, const QString &notes)

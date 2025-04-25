@@ -29,9 +29,9 @@
   <widget class="QPushButton" name="createProfileButton">
    <property name="geometry">
     <rect>
-     <x>760</x>
+     <x>740</x>
      <y>40</y>
-     <width>101</width>
+     <width>121</width>
      <height>25</height>
     </rect>
    </property>
@@ -93,6 +93,17 @@
     <property name="font">
      <font>
       <pointsize>9</pointsize>
+     </font>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Insulation Duration(hr)</string>
+    </property>
+    <property name="font">
+     <font>
+      <family>DejaVu Sans</family>
+      <pointsize>6</pointsize>
      </font>
     </property>
    </column>

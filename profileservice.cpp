@@ -49,6 +49,9 @@ bool ProfileService::setField(User field, const QVariant &value)
 
         case GlucoseTarget :
             fieldName = "glucoseTarget";
+
+        case InsulationDuration :
+            fieldName = "insulationDuration";
     }
     QSqlQuery query;
     query.prepare("UPDATE profiles SET " + fieldName + " = :val WHERE id = :id");
@@ -88,6 +91,10 @@ QVariant ProfileService::getField(User field){
 
         case GlucoseTarget :
             fieldName = "glucoseTarget";
+            break;
+
+        case InsulationDuration :
+            fieldName = "insulationDuration";
             break;
     }
      QSqlQuery query;

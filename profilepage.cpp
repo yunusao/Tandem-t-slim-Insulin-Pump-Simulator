@@ -38,10 +38,11 @@ void ProfilePage::loadProfiles() {
       ui->profilesTable->setItem(row,2, new QTableWidgetItem(q.value("carbRatio").toString()));
       ui->profilesTable->setItem(row,3, new QTableWidgetItem(q.value("correctionFactor").toString()));
       ui->profilesTable->setItem(row,4, new QTableWidgetItem(q.value("glucoseTarget").toString()));
+      ui->profilesTable->setItem(row,5, new QTableWidgetItem(q.value("insulationDuration").toString()));
       QPushButton *editButton = new QPushButton("Edit");
       QPushButton *deleteButton = new QPushButton("Delete");
-      ui->profilesTable->setCellWidget(row,5,editButton);
-      ui->profilesTable->setCellWidget(row,6,deleteButton);
+      ui->profilesTable->setCellWidget(row,6,editButton);
+      ui->profilesTable->setCellWidget(row,7,deleteButton);
 
       //edit button
       connect(editButton, &QPushButton::clicked, [=]() {

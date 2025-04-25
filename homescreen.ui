@@ -483,8 +483,8 @@ Disconnection</string>
     <rect>
      <x>10</x>
      <y>350</y>
-     <width>321</width>
-     <height>41</height>
+     <width>431</width>
+     <height>51</height>
     </rect>
    </property>
    <column>
@@ -533,6 +533,17 @@ Disconnection</string>
     </property>
     <property name="font">
      <font>
+      <pointsize>6</pointsize>
+     </font>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Insulation Duration (hr)</string>
+    </property>
+    <property name="font">
+     <font>
+      <family>DejaVu Sans</family>
       <pointsize>6</pointsize>
      </font>
     </property>
