@@ -22,6 +22,11 @@ CreateEditProfile::CreateEditProfile(QWidget *parent, int editProfileId, HomeScr
     //If already a user, get the id associated with that profile and populate the
     //the input boxes with the values of the fields corressponding to that id
     //The UI allows you to change this value even if its preset
+    ui->nameEdit->setPlaceholderText("e.g., John Doe");
+    ui->basalEdit->setPlaceholderText("Enter between 0.0 - 2.0");
+    ui->carbEdit->setPlaceholderText("range: 1 unit:1 gram to 1 unit:300 grams");
+    ui->corrEdit->setPlaceholderText("range: 1 unit:0.1 mmol/L to 1 unit:33.3 mmol/L");
+    ui->targetEdit->setPlaceholderText("range: 3.9 mmol/L to 13.9 mmol/L");
     if (id != -1) {
         qDebug() << id;
         QSqlQuery q;
