@@ -7,16 +7,16 @@
 - Jonah Pelkey
 - Hayden Chung
 - Adam Saleh
-- Ahmid Kamara
+- Sulaiman Ahmid Kamara
 
 ## CONTRIBUTIONS
 ❖ Adam Saleh:
     ➢ Use case
-    ➢ Requirement Traceability Matrix
+    ➢ UML diagram
     ➢ Database- Error log & Profile Page Setup
     
 ❖ Ahmid Kamara:
-    ➢ UML diagrams
+    ➢ Tracebility Matrix
     ➢ State Diagrams / Sequence Diagrams
     ➢ Manual Bolus logic
     
