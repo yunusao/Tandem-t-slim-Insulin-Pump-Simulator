@@ -13,7 +13,7 @@
 ❖ Adam Saleh:
     ➢ Use case
     ➢ UML diagram
-    ➢ Database- Error log & Profile Page Setup
+    ➢ Database- Error log & Profile Page Setup/Logic
     
 ❖ Ahmid Kamara:
     ➢ Traceability Matrix
@@ -23,11 +23,14 @@
 ❖ Yunus Abu-Oshaibah
     ➢ Insulin Pump UI (all UI components)
     ➢ Debugging
+    ➢ UML diagram
     ➢ Button Logic for UI
     
 ❖ Jonah Pelkey
     ➢ Insulin Pump Central hub logic
     ➢ Insulin Pump malfunction logic
+    ➢ UML diagram
+    ➢ Error log logic
     
 ❖ Hayden Chung
     ➢ Insulin Pump control Logic (start/stop/resume)
