@@ -13,7 +13,7 @@
 ❖ Adam Saleh:
     ➢ Use case
     ➢ UML diagram
-    ➢ Database- Error log & Profile Page Setup/Logic
+    ➢ Database- Error log & Profile Page/Service Setup/Logic
     
 ❖ Ahmid Kamara:
     ➢ Traceability Matrix
