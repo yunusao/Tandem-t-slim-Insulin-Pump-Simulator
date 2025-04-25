@@ -77,7 +77,7 @@ void ProfilePage::loadProfiles() {
      if (q.value("active").toInt() == 1) {
          QLabel *label = new QLabel("Active");
          label->setAlignment(Qt::AlignCenter);
-         ui->profilesTable->setCellWidget(row,7,label);
+         ui->profilesTable->setCellWidget(row,8,label);
      } else {
         QPushButton *activeButton = new QPushButton("Set Active");
         connect(activeButton,&QPushButton::clicked, [=]() {
@@ -85,7 +85,7 @@ void ProfilePage::loadProfiles() {
             emit newActiveProfile();
             loadProfiles();
         });
-        ui->profilesTable->setCellWidget(row,7,activeButton);
+        ui->profilesTable->setCellWidget(row,8,activeButton);
      }
     }
 

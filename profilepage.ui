@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>947</width>
+    <width>979</width>
     <height>399</height>
    </rect>
   </property>
@@ -29,7 +29,7 @@
   <widget class="QPushButton" name="createProfileButton">
    <property name="geometry">
     <rect>
-     <x>740</x>
+     <x>830</x>
      <y>40</y>
      <width>121</width>
      <height>25</height>
@@ -57,10 +57,15 @@
     <rect>
      <x>60</x>
      <y>70</y>
-     <width>801</width>
+     <width>891</width>
      <height>291</height>
     </rect>
    </property>
+   <column>
+    <property name="text">
+     <string>Name</string>
+    </property>
+   </column>
    <column>
     <property name="text">
      <string>Basal Rate</string>

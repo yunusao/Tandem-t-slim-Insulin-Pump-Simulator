@@ -508,7 +508,8 @@ void HomeScreen::resumeBasal(bool logEvent1, const QString &reason) {
 
 void HomeScreen::deliverBolus(double units, int durationMs)
 {
-   if (durationMs <= 0) {
+    //uses active profiles insulation durratioon converted to mss
+   if (durationMs >= 0) {
        if (units > insulinRemainingUnits)
            units = insulinRemainingUnits;
        insulinRemainingUnits -= units;

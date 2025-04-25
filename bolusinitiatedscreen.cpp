@@ -1,5 +1,7 @@
 #include "bolusinitiatedscreen.h"
 #include "ui_bolusinitiatedscreen.h"
+#include "homescreen.h"
+#include <QDebug>
 
 /**
  * @brief BolusInitiatedScreen::BolusInitiatedScreen
@@ -45,5 +47,17 @@ void BolusInitiatedScreen::showWithUnits(QString units)
 {
     ui->labelUnits->setText(units + " u");
     this->show();
+    HomeScreen* home = nullptr;
+        QWidget* w = this;
+        while (w && !home) {
+            home = qobject_cast<HomeScreen*>(w);
+            w = w->parentWidget();
+        }
+        if (home) {
+            home->deliverBolus(units.toDouble(), 100); // Extended bolus delivery
+            qDebug()<<"Does it work";
+            qDebug()<<units.toDouble();
+        }
     autoCloseTimer->start(3000);  // 3 seconds
+
 }
