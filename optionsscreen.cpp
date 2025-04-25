@@ -11,6 +11,7 @@ OptionsScreen::OptionsScreen(HomeScreen *home, QWidget *parent) :
 {
     ui->setupUi(this);
 
+    //This section iniitializes an instance of seperate screens which can be loaded upon click
     profilePage = new ProfilePage(homeScreen, this);
 
     connect(profilePage, &ProfilePage::newActiveProfile, homeScreen, &HomeScreen::loadActiveUser);
@@ -51,6 +52,10 @@ void OptionsScreen::on_eventLogButton_clicked()
     eventLogPage->show();
 }
 
+/**
+ * @brief OptionsScreen::on_toggleInsulinButton_clicked
+ * Calls basal manipulation functions upon click
+ */
 void OptionsScreen::on_toggleInsulinButton_clicked()
 {
     if (homeScreen->isBasalActive()) {
@@ -61,6 +66,10 @@ void OptionsScreen::on_toggleInsulinButton_clicked()
     updateToggleInsulinLabel();
 }
 
+/**
+ * @brief OptionsScreen::updateToggleInsulinLabel
+ * Helped function updates value of a label
+ */
 void OptionsScreen::updateToggleInsulinLabel()
 {
     if (homeScreen->isBasalActive()) {

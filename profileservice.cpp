@@ -2,18 +2,36 @@
 
 
 int ProfileService::id = 0;
+/**
+ * @brief ProfileService::ProfileService
+ * @param parent
+ * This backend service component is used to query, update and retreive data related to a profile stored in our database
+ */
 ProfileService::ProfileService(QObject *parent) : QObject(parent)
 {
 }
 
+/**
+ * @brief ProfileService::setId
+ * @param currentId
+ */
 void ProfileService::setId(int currentId){
     id = currentId;
 }
 
+/**
+ * @brief ProfileService::getId
+ * @return
+ */
 int ProfileService::getId(){
     return id;
 }
 
+/**
+ * @brief ProfileService::setActiveProfile
+ * @param currentId
+ * sets the given profile to active
+ */
 void ProfileService::setActiveProfile(int currentId){
     QSqlQuery query;
     if (!query.exec("UPDATE profiles set active = 0")){
@@ -25,6 +43,13 @@ void ProfileService::setActiveProfile(int currentId){
     setId(currentId);
 }
 
+/**
+ * @brief ProfileService::setField
+ * @param field
+ * @param value
+ * @return
+ * Updates value of a given field for the active user
+ */
 bool ProfileService::setField(User field, const QVariant &value)
 {
     if (id == -1) {
@@ -63,6 +88,12 @@ bool ProfileService::setField(User field, const QVariant &value)
     return true;
 }
 
+/**
+ * @brief ProfileService::getField
+ * @param field
+ * @return
+ * Retreive active users information
+ */
 QVariant ProfileService::getField(User field){
     if (getId() == -1) {
         return false;
