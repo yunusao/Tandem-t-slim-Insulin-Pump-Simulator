@@ -63,11 +63,6 @@
    </property>
    <column>
     <property name="text">
-     <string>Name</string>
-    </property>
-   </column>
-   <column>
-    <property name="text">
      <string>Basal Rate</string>
     </property>
    </column>
